@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">ParkingWidgetApp</string>
+    <string name="app_name">Parking Widget</string>
+    <string name="widget_description">주차 위치를 홈 화면에 표시합니다</string>
 </resources>
