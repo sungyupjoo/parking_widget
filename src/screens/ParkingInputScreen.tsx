@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,9 @@ import {
   NativeModules,
   BackHandler,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors } from '../constants/colors';
@@ -20,11 +23,17 @@ export default function ParkingInputScreen() {
   const [areaSection, setAreaSection] = useState<string>('');
   const [isEditingMode, setIsEditingMode] = useState<boolean>(false);
 
-  // Check if save button should be enabled
+  const scrollViewRef = useRef<ScrollView>(null);
+
   const isSaveEnabled = floorType && floorNumber.trim();
 
+  const scrollToSaveButton = () => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollToEnd({ animated: true });
+    }
+  };
+
   useEffect(() => {
-    // Load saved location on component mount
     loadSavedLocation();
   }, []);
 
@@ -131,142 +140,169 @@ export default function ParkingInputScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Current saved location display - Enhanced */}
-      <View style={styles.currentLocationContainer}>
-        <View style={styles.locationHeaderContainer}>
-          <Text style={styles.locationIcon}>🚗</Text>
-          <Text style={styles.currentLocationLabel}>현재 저장된 위치</Text>
-        </View>
-        <View style={styles.locationValueContainer}>
-          <Text style={styles.currentLocationText}>{currentSavedLocation}</Text>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+    >
+      <ScrollView
+        ref={scrollViewRef}
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContentContainer}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        {/* Current saved location display - Enhanced */}
+        <View style={styles.currentLocationContainer}>
+          <View style={styles.locationHeaderContainer}>
+            <Text style={styles.locationIcon}>🚗</Text>
+            <Text style={styles.currentLocationLabel}>현재 저장된 위치</Text>
+          </View>
+          <View style={styles.locationValueContainer}>
+            <Text style={styles.currentLocationText}>
+              {currentSavedLocation}
+            </Text>
+          </View>
+
+          {/* Edit and Remove buttons - only show if there's saved data */}
+          {currentSavedLocation && currentSavedLocation !== '없음' && (
+            <View style={styles.actionButtonsContainer}>
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={editCurrentLocation}
+              >
+                <Text style={styles.actionButtonText}>✏️ 편집</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.actionButton, styles.removeButton]}
+                onPress={removeCurrentLocation}
+              >
+                <Text
+                  style={[styles.actionButtonText, styles.removeButtonText]}
+                >
+                  🗑️ 삭제
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
 
-        {/* Edit and Remove buttons - only show if there's saved data */}
-        {currentSavedLocation && currentSavedLocation !== '없음' && (
-          <View style={styles.actionButtonsContainer}>
+        {/* Input section with editing mode emphasis */}
+        <View
+          style={[
+            styles.inputSection,
+            isEditingMode && styles.inputSectionEditing,
+          ]}
+        >
+          <Text style={styles.label}>주차 위치 입력</Text>
+
+          <View style={styles.floorTypeContainer}>
             <TouchableOpacity
-              style={styles.actionButton}
-              onPress={editCurrentLocation}
+              style={[
+                styles.floorTypeButton,
+                floorType === '지하' && styles.floorTypeButtonActive,
+              ]}
+              onPress={() => setFloorType('지하')}
             >
-              <Text style={styles.actionButtonText}>✏️ 편집</Text>
+              <Text style={styles.floorTypeEmoji}>🅿️</Text>
+              <Text
+                style={[
+                  styles.floorTypeButtonText,
+                  floorType === '지하' && styles.floorTypeButtonTextActive,
+                ]}
+              >
+                지하
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.actionButton, styles.removeButton]}
-              onPress={removeCurrentLocation}
+              style={[
+                styles.floorTypeButton,
+                floorType === '지상' && styles.floorTypeButtonActiveGreen,
+              ]}
+              onPress={() => setFloorType('지상')}
             >
-              <Text style={[styles.actionButtonText, styles.removeButtonText]}>
-                🗑️ 삭제
+              <Text style={styles.floorTypeEmoji}>🌤️</Text>
+              <Text
+                style={[
+                  styles.floorTypeButtonText,
+                  floorType === '지상' && styles.floorTypeButtonTextActive,
+                ]}
+              >
+                지상
               </Text>
             </TouchableOpacity>
           </View>
-        )}
-      </View>
 
-      {/* Input section with editing mode emphasis */}
-      <View
-        style={[
-          styles.inputSection,
-          isEditingMode && styles.inputSectionEditing,
-        ]}
-      >
-        <Text style={styles.label}>주차 위치 입력</Text>
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>
+              층수 <Text style={styles.requiredMark}>필수</Text>
+            </Text>
+            <TextInput
+              style={styles.input}
+              placeholder="예: 2"
+              value={floorNumber}
+              onChangeText={setFloorNumber}
+              keyboardType="numeric"
+              returnKeyType="next"
+              onFocus={scrollToSaveButton}
+            />
+          </View>
 
-        <View style={styles.floorTypeContainer}>
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>
+              구역 <Text style={styles.optionalMark}>선택사항</Text>
+            </Text>
+            <TextInput
+              style={styles.input}
+              placeholder="예: A구역, 2D"
+              value={areaSection}
+              onChangeText={setAreaSection}
+              returnKeyType="done"
+              onFocus={scrollToSaveButton}
+            />
+          </View>
+
           <TouchableOpacity
             style={[
-              styles.floorTypeButton,
-              floorType === '지하' && styles.floorTypeButtonActive,
+              styles.saveButton,
+              !isSaveEnabled && styles.saveButtonDisabled,
             ]}
-            onPress={() => setFloorType('지하')}
+            onPress={saveLocation}
+            disabled={!isSaveEnabled}
           >
-            <Text style={styles.floorTypeEmoji}>🅿️</Text>
             <Text
               style={[
-                styles.floorTypeButtonText,
-                floorType === '지하' && styles.floorTypeButtonTextActive,
+                styles.saveButtonText,
+                !isSaveEnabled && styles.saveButtonTextDisabled,
               ]}
             >
-              지하
+              ✓ 저장
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.floorTypeButton,
-              floorType === '지상' && styles.floorTypeButtonActiveGreen,
-            ]}
-            onPress={() => setFloorType('지상')}
-          >
-            <Text style={styles.floorTypeEmoji}>🌤️</Text>
-            <Text
-              style={[
-                styles.floorTypeButtonText,
-                floorType === '지상' && styles.floorTypeButtonTextActive,
-              ]}
-            >
-              지상
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>
-            층수 <Text style={styles.requiredMark}>필수</Text>
+          <Text style={styles.cautionSaveText}>
+            {isSaveEnabled ? '' : '층수를 입력해주세요'}
           </Text>
-          <TextInput
-            style={styles.input}
-            placeholder="예: 2"
-            value={floorNumber}
-            onChangeText={setFloorNumber}
-            keyboardType="numeric"
-          />
         </View>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>
-            구역 <Text style={styles.optionalMark}>선택사항</Text>
-          </Text>
-          <TextInput
-            style={styles.input}
-            placeholder="예: A구역, 2D"
-            value={areaSection}
-            onChangeText={setAreaSection}
-          />
-        </View>
-
-        <TouchableOpacity
-          style={[
-            styles.saveButton,
-            !isSaveEnabled && styles.saveButtonDisabled,
-          ]}
-          onPress={saveLocation}
-          disabled={!isSaveEnabled}
-        >
-          <Text
-            style={[
-              styles.saveButtonText,
-              !isSaveEnabled && styles.saveButtonTextDisabled,
-            ]}
-          >
-            ✓ 저장
-          </Text>
-        </TouchableOpacity>
-        <Text style={styles.cautionSaveText}>
-          {isSaveEnabled ? '' : '층수를 입력해주세요'}
-        </Text>
-      </View>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
-    justifyContent: 'center',
     backgroundColor: Colors.background,
   },
-  // Enhanced current location display
+  scrollView: {
+    flex: 1,
+  },
+  scrollContentContainer: {
+    flexGrow: 1,
+    padding: 24,
+    paddingTop: 40,
+    paddingBottom: 40,
+  },
+
   currentLocationContainer: {
     backgroundColor: Colors.lightGray,
     padding: 20,
