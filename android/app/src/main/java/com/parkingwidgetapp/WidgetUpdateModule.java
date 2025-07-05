@@ -58,7 +58,9 @@ public class WidgetUpdateModule extends ReactContextBaseJavaModule {
                 android.util.Log.e("WidgetUpdateModule", "Error reading AsyncStorage SQLite: " + e.getMessage());
             }
             
-            ParkingWidgetProvider.updateAllWidgets(context);
+            // Update all widget sizes
+            ParkingWidgetMediumProvider.updateAllWidgets(context);
+            ParkingWidgetSquareProvider.updateAllWidgets(context);
         } else {
             android.util.Log.e("WidgetUpdateModule", "Context is null!");
         }

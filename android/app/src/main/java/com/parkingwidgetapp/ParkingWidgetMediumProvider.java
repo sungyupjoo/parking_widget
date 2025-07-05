@@ -4,14 +4,14 @@ import android.appwidget.AppWidgetProvider;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.widget.RemoteViews;
-import android.content.SharedPreferences;
 import android.content.Intent;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.Cursor;
+import android.content.SharedPreferences;
 
-public class ParkingWidgetProvider extends AppWidgetProvider {
+public class ParkingWidgetMediumProvider extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -41,25 +41,21 @@ public class ParkingWidgetProvider extends AppWidgetProvider {
             
             if (cursor.moveToFirst()) {
                 parkingLocation = cursor.getString(0);
-                android.util.Log.d("ParkingWidget", "Successfully read from AsyncStorage: " + parkingLocation);
-            } else {
-                android.util.Log.d("ParkingWidget", "No data found in AsyncStorage");
+                android.util.Log.d("ParkingWidgetMedium", "Medium widget location: " + parkingLocation);
             }
             
             cursor.close();
             db.close();
             
         } catch (Exception e) {
-            android.util.Log.e("ParkingWidget", "Error reading from AsyncStorage: " + e.getMessage());
-            // Fallback to SharedPreferences just in case
+            android.util.Log.e("ParkingWidgetMedium", "Error reading from AsyncStorage: " + e.getMessage());
+            // Fallback to SharedPreferences
             SharedPreferences prefs = context.getSharedPreferences("RCTAsyncLocalStorage", Context.MODE_PRIVATE);
             parkingLocation = prefs.getString("parkingLocation", "위치 없음");
         }
 
-        android.util.Log.d("ParkingWidget", "Final parking location: " + parkingLocation);
-
         for (int widgetId : appWidgetIds) {
-            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_parking);
+            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_parking_medium);
             views.setTextViewText(R.id.parking_text, parkingLocation);
 
             // Add click functionality to open the app
@@ -73,11 +69,9 @@ public class ParkingWidgetProvider extends AppWidgetProvider {
     }
 
     public static void updateAllWidgets(Context context) {
-        android.util.Log.d("ParkingWidget", "updateAllWidgets() called");
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-        ComponentName componentName = new ComponentName(context, ParkingWidgetProvider.class);
+        ComponentName componentName = new ComponentName(context, ParkingWidgetMediumProvider.class);
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(componentName);
-        android.util.Log.d("ParkingWidget", "Found " + appWidgetIds.length + " widgets to update");
         updateWidget(context, appWidgetManager, appWidgetIds);
     }
-}
+} 

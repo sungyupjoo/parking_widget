@@ -23,14 +23,25 @@
         </intent-filter>
       </activity>
       
-      <!-- Widget Provider -->
-      <receiver android:name=".ParkingWidgetProvider"
+      <!-- Widget Providers -->
+      <!-- Medium 2x1 Widget -->
+      <receiver android:name=".ParkingWidgetMediumProvider"
           android:exported="true">
           <intent-filter>
               <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
           </intent-filter>
           <meta-data android:name="android.appwidget.provider"
-              android:resource="@xml/parking_widget_info" />
+              android:resource="@xml/parking_widget_medium_info" />
+      </receiver>
+      
+      <!-- Square 2x2 Widget -->
+      <receiver android:name=".ParkingWidgetSquareProvider"
+          android:exported="true">
+          <intent-filter>
+              <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+          </intent-filter>
+          <meta-data android:name="android.appwidget.provider"
+              android:resource="@xml/parking_widget_square_info" />
       </receiver>
     </application>
 </manifest>
