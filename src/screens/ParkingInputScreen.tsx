@@ -165,7 +165,7 @@ export default function ParkingInputScreen() {
           </View>
 
           {/* Edit and Remove buttons - only show if there's saved data */}
-          {currentSavedLocation && currentSavedLocation !== '없음' && (
+          {currentSavedLocation && currentSavedLocation !== '없음' ? (
             <View style={styles.actionButtonsContainer}>
               <TouchableOpacity
                 style={styles.actionButton}
@@ -183,6 +183,12 @@ export default function ParkingInputScreen() {
                   🗑️ 삭제
                 </Text>
               </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.actionButtonsContainer}>
+              <Text style={styles.notificationText}>
+                아래에 주차 위치를 입력하고 저장하세요.
+              </Text>
             </View>
           )}
         </View>
@@ -280,7 +286,7 @@ export default function ParkingInputScreen() {
             </Text>
           </TouchableOpacity>
           <Text style={styles.cautionSaveText}>
-            {isSaveEnabled ? '' : '층수를 입력해주세요'}
+            {isSaveEnabled ? '' : '층수를 입력해주세요.'}
           </Text>
         </View>
       </ScrollView>
@@ -362,6 +368,11 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
   },
+  notificationText: {
+    fontSize: 14,
+    color: Colors.red,
+    fontWeight: '500',
+  },
   removeButton: {
     backgroundColor: Colors.red,
   },
@@ -436,7 +447,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     backgroundColor: Colors.redBackground,
-    paddingHorizontal: 4,
     paddingVertical: 1,
     borderRadius: 4,
   },
@@ -509,7 +519,7 @@ const styles = StyleSheet.create({
   },
   cautionSaveText: {
     color: Colors.red,
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '500',
     marginTop: 8,
     textAlign: 'center',
