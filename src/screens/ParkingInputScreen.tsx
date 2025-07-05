@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TextInput,
-  Button,
   StyleSheet,
   Alert,
   NativeModules,
@@ -11,6 +10,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Colors } from '../constants/colors';
 
 export default function ParkingInputScreen() {
   const [currentSavedLocation, setCurrentSavedLocation] =
@@ -18,6 +18,10 @@ export default function ParkingInputScreen() {
   const [floorType, setFloorType] = useState<'지하' | '지상'>('지하');
   const [floorNumber, setFloorNumber] = useState<string>('');
   const [areaSection, setAreaSection] = useState<string>('');
+  const [isEditingMode, setIsEditingMode] = useState<boolean>(false);
+
+  // Check if save button should be enabled
+  const isSaveEnabled = floorType && floorNumber.trim();
 
   useEffect(() => {
     // Load saved location on component mount
@@ -37,21 +41,18 @@ export default function ParkingInputScreen() {
 
   const editCurrentLocation = () => {
     if (currentSavedLocation && currentSavedLocation !== '없음') {
-      // Parse the saved location back into components
       const parts = currentSavedLocation.split(' ');
       if (parts.length >= 2) {
-        // Extract floor type (지하/지상)
         const floorTypeFromSaved = parts[0] as '지하' | '지상';
         setFloorType(floorTypeFromSaved);
 
-        // Extract floor number (remove '층' if present)
         const floorNumberFromSaved = parts[1].replace('층', '');
         setFloorNumber(floorNumberFromSaved);
 
-        // Extract area (everything after floor number)
         const areaFromSaved = parts.slice(2).join(' ');
         setAreaSection(areaFromSaved);
       }
+      setIsEditingMode(true);
     }
   };
 
@@ -85,8 +86,8 @@ export default function ParkingInputScreen() {
   };
 
   const saveLocation = async () => {
-    if (!floorNumber.trim()) {
-      Alert.alert('입력 오류', '층수는 필수입니다.');
+    if (!isSaveEnabled) {
+      Alert.alert('알림', '지하/지상과 층수를 모두 선택해주세요.');
       return;
     }
 
@@ -100,6 +101,9 @@ export default function ParkingInputScreen() {
       if (NativeModules.WidgetUpdateModule) {
         NativeModules.WidgetUpdateModule.updateWidget();
       }
+
+      // Reset editing mode after successful save
+      setIsEditingMode(false);
 
       Alert.alert(
         '저장 완료',
@@ -128,10 +132,15 @@ export default function ParkingInputScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Current saved location display */}
+      {/* Current saved location display - Enhanced */}
       <View style={styles.currentLocationContainer}>
-        <Text style={styles.currentLocationLabel}>현재 저장된 위치:</Text>
-        <Text style={styles.currentLocationText}>{currentSavedLocation}</Text>
+        <View style={styles.locationHeaderContainer}>
+          <Text style={styles.locationIcon}>🚗</Text>
+          <Text style={styles.currentLocationLabel}>현재 저장된 위치</Text>
+        </View>
+        <View style={styles.locationValueContainer}>
+          <Text style={styles.currentLocationText}>{currentSavedLocation}</Text>
+        </View>
 
         {/* Edit and Remove buttons - only show if there's saved data */}
         {currentSavedLocation && currentSavedLocation !== '없음' && (
@@ -154,65 +163,98 @@ export default function ParkingInputScreen() {
         )}
       </View>
 
-      <Text style={styles.label}>주차 위치 입력</Text>
+      {/* Input section with editing mode emphasis */}
+      <View
+        style={[
+          styles.inputSection,
+          isEditingMode && styles.inputSectionEditing,
+        ]}
+      >
+        <Text style={styles.label}>주차 위치 입력</Text>
 
-      {/* Floor type selector */}
-      <View style={styles.floorTypeContainer}>
+        <View style={styles.floorTypeContainer}>
+          <TouchableOpacity
+            style={[
+              styles.floorTypeButton,
+              floorType === '지하' && styles.floorTypeButtonActive,
+            ]}
+            onPress={() => setFloorType('지하')}
+          >
+            <Text style={styles.floorTypeEmoji}>🅿️</Text>
+            <Text
+              style={[
+                styles.floorTypeButtonText,
+                floorType === '지하' && styles.floorTypeButtonTextActive,
+              ]}
+            >
+              지하
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.floorTypeButton,
+              floorType === '지상' && styles.floorTypeButtonActiveGreen,
+            ]}
+            onPress={() => setFloorType('지상')}
+          >
+            <Text style={styles.floorTypeEmoji}>🌤️</Text>
+            <Text
+              style={[
+                styles.floorTypeButtonText,
+                floorType === '지상' && styles.floorTypeButtonTextActive,
+              ]}
+            >
+              지상
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputLabel}>
+            층수 <Text style={styles.requiredMark}>필수</Text>
+          </Text>
+          <TextInput
+            style={styles.input}
+            placeholder="예: 2"
+            value={floorNumber}
+            onChangeText={setFloorNumber}
+            keyboardType="numeric"
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputLabel}>
+            구역 <Text style={styles.optionalMark}>선택사항</Text>
+          </Text>
+          <TextInput
+            style={styles.input}
+            placeholder="예: A구역, 2D"
+            value={areaSection}
+            onChangeText={setAreaSection}
+          />
+        </View>
+
         <TouchableOpacity
           style={[
-            styles.floorTypeButton,
-            floorType === '지하' && styles.floorTypeButtonActive,
+            styles.saveButton,
+            !isSaveEnabled && styles.saveButtonDisabled,
           ]}
-          onPress={() => setFloorType('지하')}
+          onPress={saveLocation}
+          disabled={!isSaveEnabled}
         >
           <Text
             style={[
-              styles.floorTypeButtonText,
-              floorType === '지하' && styles.floorTypeButtonTextActive,
+              styles.saveButtonText,
+              !isSaveEnabled && styles.saveButtonTextDisabled,
             ]}
           >
-            지하
+            ✓ 저장
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.floorTypeButton,
-            floorType === '지상' && styles.floorTypeButtonActive,
-          ]}
-          onPress={() => setFloorType('지상')}
-        >
-          <Text
-            style={[
-              styles.floorTypeButtonText,
-              floorType === '지상' && styles.floorTypeButtonTextActive,
-            ]}
-          >
-            지상
-          </Text>
-        </TouchableOpacity>
+        <Text style={styles.cautionSaveText}>
+          {isSaveEnabled ? '' : '층수를 입력해주세요'}
+        </Text>
       </View>
-
-      {/* Floor number input */}
-      <TextInput
-        style={styles.input}
-        placeholder="층수 (예: 2)"
-        value={floorNumber}
-        onChangeText={setFloorNumber}
-        keyboardType="numeric"
-      />
-
-      {/* Area section input */}
-      <TextInput
-        style={styles.input}
-        placeholder="구역 (예: A구역, 2D)"
-        value={areaSection}
-        onChangeText={setAreaSection}
-      />
-
-      {/* Stylish save button */}
-      <TouchableOpacity style={styles.saveButton} onPress={saveLocation}>
-        <Text style={styles.saveButtonText}>💾 저장</Text>
-      </TouchableOpacity>
     </View>
   );
 }
@@ -222,108 +264,218 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 24,
     justifyContent: 'center',
+    backgroundColor: Colors.background,
   },
-  // Current location display
+  // Enhanced current location display
   currentLocationContainer: {
-    backgroundColor: '#f0f0f0',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 24,
+    backgroundColor: Colors.lightGray,
+    padding: 20,
+    borderRadius: 12,
+    marginBottom: 32,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    shadowColor: Colors.shadow,
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  locationHeaderContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  locationIcon: {
+    fontSize: 20,
+    marginRight: 8,
   },
   currentLocationLabel: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 4,
+    fontSize: 16,
+    color: Colors.gray,
+    fontWeight: '600',
+  },
+  locationValueContainer: {
+    backgroundColor: Colors.white,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    minWidth: '80%',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#dee2e6',
   },
   currentLocationText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: Colors.darkGray,
   },
   actionButtonsContainer: {
     flexDirection: 'row',
-    marginTop: 12,
+    marginTop: 16,
     gap: 8,
   },
   actionButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-    backgroundColor: '#007AFF',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: Colors.green,
     flex: 1,
     alignItems: 'center',
   },
   removeButton: {
-    backgroundColor: '#FF3B30',
+    backgroundColor: Colors.red,
   },
   actionButtonText: {
-    color: '#fff',
-    fontSize: 12,
+    color: Colors.white,
+    fontSize: 13,
     fontWeight: '600',
   },
   removeButtonText: {
-    color: '#fff',
+    color: Colors.white,
   },
   label: {
     fontSize: 20,
-    marginBottom: 12,
+    marginBottom: 16,
     fontWeight: 'bold',
+    color: Colors.darkGray,
   },
-  // Floor type selector
   floorTypeContainer: {
     flexDirection: 'row',
-    marginBottom: 16,
-    gap: 8,
+    marginBottom: 20,
+    gap: 12,
   },
   floorTypeButton: {
     flex: 1,
-    padding: 12,
-    borderRadius: 8,
+    padding: 16,
+    borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#ddd',
-    backgroundColor: '#fff',
+    borderColor: '#e9ecef',
+    backgroundColor: Colors.white,
     alignItems: 'center',
+    shadowColor: Colors.shadow,
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   floorTypeButtonActive: {
-    borderColor: '#007AFF',
-    backgroundColor: '#007AFF',
+    borderColor: Colors.gray,
+    backgroundColor: Colors.gray,
+  },
+  floorTypeButtonActiveGreen: {
+    borderColor: Colors.blue,
+    backgroundColor: Colors.blue,
+  },
+  floorTypeEmoji: {
+    fontSize: 20,
+    marginBottom: 4,
   },
   floorTypeButtonText: {
     fontSize: 16,
-    color: '#666',
+    color: Colors.gray,
     fontWeight: '600',
   },
   floorTypeButtonTextActive: {
-    color: '#fff',
+    color: Colors.white,
+  },
+  // Input styling
+  inputContainer: {
+    marginBottom: 20,
+  },
+  inputLabel: {
+    fontSize: 16,
+    color: Colors.gray,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  requiredMark: {
+    color: Colors.red,
+    fontSize: 12,
+    fontWeight: '700',
+    backgroundColor: Colors.redBackground,
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    borderRadius: 4,
+  },
+  optionalMark: {
+    color: Colors.disabled,
+    fontSize: 12,
+    fontWeight: '500',
+    backgroundColor: Colors.lightGray,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#aaa',
-    padding: 12,
+    borderColor: '#ced4da',
+    padding: 14,
     borderRadius: 8,
-    marginBottom: 16,
     fontSize: 16,
+    backgroundColor: Colors.white,
   },
-  // Stylish save button
-  saveButton: {
-    backgroundColor: '#007AFF',
-    padding: 16,
+  // Subtle save button
+  // Input section styling
+  inputSection: {
     borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 8,
-    shadowColor: '#000',
+    padding: 2,
+    marginBottom: 8,
+  },
+  inputSectionEditing: {
+    borderWidth: 2,
+    borderColor: Colors.green,
+    backgroundColor: Colors.greenBackground,
+    padding: 16,
+    shadowColor: Colors.green,
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  saveButton: {
+    backgroundColor: Colors.blue,
+    padding: 18,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 16,
+    shadowColor: Colors.shadow,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.15,
     shadowRadius: 3.84,
-    elevation: 5,
+    elevation: 3,
+  },
+  saveButtonDisabled: {
+    backgroundColor: Colors.disabled,
+    shadowOpacity: 0.05,
+    elevation: 1,
   },
   saveButtonText: {
-    color: '#fff',
+    color: Colors.white,
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  saveButtonTextDisabled: {
+    color: Colors.lightGray,
+    fontWeight: '500',
+  },
+  cautionSaveText: {
+    color: Colors.red,
+    fontSize: 16,
+    fontWeight: '500',
+    marginTop: 8,
+    textAlign: 'center',
   },
 });
