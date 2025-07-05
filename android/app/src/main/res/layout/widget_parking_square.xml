@@ -3,30 +3,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/widget_background_gray"
-    android:padding="20dp"
+    android:padding="8dp"
     android:orientation="vertical"
     android:gravity="center">
 
-    <!-- Header with parking emoji and title -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
-        android:layout_marginBottom="16dp">
-
-        <ImageView
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:src="@drawable/logo_widget"
-            android:layout_marginRight="8dp"
-            android:scaleType="centerCrop" />
+        android:layout_marginBottom="12dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="주차 위치"
-            android:textSize="18sp"
+            android:text="🚗 주차 위치"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="#555555"
             android:gravity="center" />
@@ -39,12 +31,12 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:text="위치 없음"
+        android:text="위치 정보 없음"
         android:textSize="24sp"
         android:textStyle="bold"
         android:textColor="#000000"
         android:gravity="center"
-        android:maxLines="3"
+        android:maxLines="1"
         android:ellipsize="end"
         android:lineSpacingExtra="4dp" />
 
@@ -56,6 +48,6 @@
         android:textSize="12sp"
         android:textColor="#888888"
         android:gravity="center"
-        android:layout_marginTop="12dp" />
+        android:layout_marginTop="8dp" />
 
 </LinearLayout> 

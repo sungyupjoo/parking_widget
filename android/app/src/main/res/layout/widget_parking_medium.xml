@@ -7,12 +7,12 @@
     android:orientation="horizontal"
     android:gravity="center_vertical">
 
-    <ImageView
+    <!-- <ImageView
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:src="@drawable/logo_widget"
         android:layout_marginRight="12dp"
-        android:scaleType="centerCrop" />
+        android:scaleType="centerCrop" /> -->
 
     <LinearLayout
         android:layout_width="0dp"
@@ -24,7 +24,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="주차 위치"
+            android:text="🚗 주차 위치"
             android:textSize="12sp"
             android:textColor="#666666"
             android:textStyle="bold"
@@ -34,7 +34,7 @@
             android:id="@+id/parking_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="위치 없음"
+            android:text="위치 정보 없음"
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="#000000"
