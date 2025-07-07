@@ -23,6 +23,15 @@
         </intent-filter>
       </activity>
       
+      <!-- Dialog Activity for Widget Input -->
+      <activity
+        android:name=".ParkingInputDialogActivity"
+        android:theme="@android:style/Theme.Holo.Light.Dialog"
+        android:excludeFromRecents="true"
+        android:exported="true"
+        android:taskAffinity=""
+        android:launchMode="singleTop" />
+      
       <!-- Widget Providers -->
       <!-- Medium 2x1 Widget -->
       <receiver android:name=".ParkingWidgetMediumProvider"
