@@ -30,7 +30,8 @@
         android:excludeFromRecents="true"
         android:exported="true"
         android:taskAffinity=""
-        android:launchMode="singleTop" />
+        android:launchMode="singleTop"
+        android:windowSoftInputMode="adjustResize" />
       
       <!-- Widget Providers -->
       <!-- Medium 2x1 Widget -->

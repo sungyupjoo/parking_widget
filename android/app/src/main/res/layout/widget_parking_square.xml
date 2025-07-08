@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/widget_background_gray"
+    android:background="@drawable/widget_background_white"
     android:padding="8dp"
     android:orientation="vertical"
     android:gravity="center">
@@ -11,43 +11,89 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center"
+        android:gravity="left|center_vertical"
         android:layout_marginBottom="12dp">
 
-        <TextView
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🚗 주차 위치"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#555555"
-            android:gravity="center" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_parking_logo"
+                android:layout_marginEnd="4dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="주차 메모"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#666666"
+                android:gravity="left"
+                 />
+
+        </LinearLayout>
 
     </LinearLayout>
 
     <!-- Main parking location text -->
-    <TextView
-        android:id="@+id/parking_text"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:text="위치 정보 없음"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="#000000"
-        android:gravity="center"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:lineSpacingExtra="4dp" />
+        android:background="@drawable/widget_content_background_blue"
+        android:padding="12dp"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/parking_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="위치 정보 없음"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:gravity="center"
+            android:maxLines="3"
+            android:ellipsize="end"
+            android:lineSpacingExtra="2dp"
+            android:layout_marginBottom="4dp" />
+
+        <!-- Saved time within main content area -->
+        <TextView
+            android:id="@+id/saved_time_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#E0E0E0"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:visibility="gone" />
+
+    </LinearLayout>
 
     <!-- Footer instruction -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="터치하여 앱 열기"
-        android:textSize="12sp"
-        android:textColor="#888888"
+        android:orientation="horizontal"
         android:gravity="center"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp">
 
-</LinearLayout> 
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="터치하여 위치 입력"
+            android:textSize="12sp"
+            android:textColor="#888888"
+            android:gravity="center" />
+
+    </LinearLayout>
+
+</LinearLayout>

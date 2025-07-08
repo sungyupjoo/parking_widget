@@ -27,14 +27,28 @@
                 android:gravity="center_vertical"
                 android:layout_marginBottom="8dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="🚗 현재 저장된 위치"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:textColor="#666666" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_parking_logo"
+                        android:layout_marginEnd="6dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="주차 위치"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#666666" />
+
+                </LinearLayout>
 
                 <Button
                     android:id="@+id/edit_button"
@@ -63,15 +77,38 @@
                 android:id="@+id/current_location_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="없음"
+                android:text="아래 입력창에 위치를 입력후 저장해주세요."
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="#000000"
                 android:background="@drawable/location_highlight"
                 android:padding="10dp"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="4dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/saved_time_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="12sp"
+                android:textColor="#999999"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone" />
 
         </LinearLayout>
+
+        <!-- Mini Title for Input Section -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="✏️ 새 주차 위치 입력"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#666666"
+            android:layout_marginBottom="12dp"
+            android:layout_marginTop="8dp" />
 
         <!-- Parking Location Input Row -->
         <LinearLayout
@@ -127,7 +164,9 @@
                 android:background="@drawable/input_underline"
                 android:layout_marginEnd="8dp"
                 android:gravity="center"
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                android:focusableInTouchMode="true"
+                android:focusedByDefault="true" />
 
             <!-- Area Section Input -->
             <EditText
@@ -135,7 +174,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:hint="구역(선택)"
+                android:hint="구역(필요시 입력)"
                 android:inputType="text"
                 android:textSize="16sp"
                 android:padding="12dp"
@@ -169,7 +208,7 @@
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:background="@drawable/button_text_only"
-                android:textColor="#1976d2" />
+                android:textColor="#1B6686" />
 
         </LinearLayout>
 

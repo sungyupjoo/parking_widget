@@ -18,13 +18,17 @@ import android.widget.Toast;
 import android.text.TextWatcher;
 import android.text.Editable;
 import android.util.Log;
+import android.os.Handler;
+import android.os.Looper;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.view.inputmethod.InputMethodManager;
 
 public class ParkingInputDialogActivity extends Activity {
     private static final String TAG = "ParkingInputDialog";
     
     private TextView currentLocationText;
+    private TextView savedTimeText;
     private Button floorTypeUnderground;
     private Button floorTypeAboveground;
     private EditText floorNumberInput;
@@ -34,9 +38,14 @@ public class ParkingInputDialogActivity extends Activity {
     private Button editButton;
     private Button deleteButton;
     
-    private String currentSavedLocation = "없음";
+    private String currentSavedLocation = null;
+    private long savedTimestamp = 0;
     private boolean isUndergroundSelected = true;
     private boolean isEditingMode = false;
+    
+    // For real-time timestamp updates
+    private Handler timestampHandler;
+    private Runnable timestampUpdater;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,13 +73,51 @@ public class ParkingInputDialogActivity extends Activity {
         
         // Apply enter animation
         overridePendingTransition(R.anim.dialog_enter, 0);
+        
+        // Start real-time timestamp updates
+        startTimestampUpdates();
+        
+        // Auto-focus on floor number input and show keyboard
+        if (floorNumberInput != null) {
+            floorNumberInput.requestFocus();
+            
+            // Show soft keyboard with slight delay to ensure UI is ready
+            floorNumberInput.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.showSoftInput(floorNumberInput, InputMethodManager.SHOW_IMPLICIT);
+                    }
+                }
+            }, 100); // 100ms delay to ensure dialog is fully shown
+        }
     }
     
     @Override
     public void finish() {
+        stopTimestampUpdates();
         super.finish();
         // Apply exit animation
         overridePendingTransition(0, R.anim.dialog_exit);
+    }
+    
+    @Override
+    protected void onDestroy() {
+        stopTimestampUpdates();
+        super.onDestroy();
+    }
+    
+    @Override
+    protected void onPause() {
+        stopTimestampUpdates();
+        super.onPause();
+    }
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startTimestampUpdates();
     }
     
     @Override
@@ -97,8 +144,78 @@ public class ParkingInputDialogActivity extends Activity {
         }
     }
     
+    private String getRelativeTimeString(long savedTimestamp) {
+        long currentTime = System.currentTimeMillis();
+        
+        // Check if saved timestamp is from today
+        java.util.Calendar savedCal = java.util.Calendar.getInstance();
+        savedCal.setTimeInMillis(savedTimestamp);
+        
+        java.util.Calendar currentCal = java.util.Calendar.getInstance();
+        currentCal.setTimeInMillis(currentTime);
+        
+        // Same day - show absolute time
+        if (savedCal.get(java.util.Calendar.YEAR) == currentCal.get(java.util.Calendar.YEAR) &&
+            savedCal.get(java.util.Calendar.DAY_OF_YEAR) == currentCal.get(java.util.Calendar.DAY_OF_YEAR)) {
+            
+            int hour = savedCal.get(java.util.Calendar.HOUR_OF_DAY);
+            int minute = savedCal.get(java.util.Calendar.MINUTE);
+            
+            String amPm = hour < 12 ? "오전" : "오후";
+            int displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+            
+            return String.format("%s %d:%02d 저장", amPm, displayHour, minute);
+        }
+        
+        // Different day - show days ago
+        long timeDiff = currentTime - savedTimestamp;
+        long days = timeDiff / (24 * 60 * 60 * 1000);
+        
+        if (days == 0) {
+            days = 1; // If less than 24 hours but different day
+        }
+        
+        return days + "일 전";
+    }
+    
+    private void startTimestampUpdates() {
+        if (timestampHandler == null) {
+            timestampHandler = new Handler(Looper.getMainLooper());
+        }
+        
+        timestampUpdater = new Runnable() {
+            @Override
+            public void run() {
+                updateTimestampDisplay();
+                // Update every minute
+                timestampHandler.postDelayed(this, 60000);
+            }
+        };
+        
+        // Start immediately
+        timestampHandler.post(timestampUpdater);
+    }
+    
+    private void stopTimestampUpdates() {
+        if (timestampHandler != null && timestampUpdater != null) {
+            timestampHandler.removeCallbacks(timestampUpdater);
+        }
+    }
+    
+    private void updateTimestampDisplay() {
+        boolean hasSavedData = currentSavedLocation != null && !currentSavedLocation.trim().isEmpty();
+        
+        if (hasSavedData && savedTimestamp > 0) {
+            savedTimeText.setText(getRelativeTimeString(savedTimestamp));
+            savedTimeText.setVisibility(View.VISIBLE);
+        } else {
+            savedTimeText.setVisibility(View.GONE);
+        }
+    }
+    
     private void initializeViews() {
         currentLocationText = findViewById(R.id.current_location_text);
+        savedTimeText = findViewById(R.id.saved_time_text);
         floorTypeUnderground = findViewById(R.id.floor_type_underground);
         floorTypeAboveground = findViewById(R.id.floor_type_aboveground);
         floorNumberInput = findViewById(R.id.floor_number_input);
@@ -216,6 +333,17 @@ public class ParkingInputDialogActivity extends Activity {
                 deleteCurrentLocation();
             }
         });
+        
+        // Make current location text clickable to enter edit mode
+        currentLocationText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Only allow editing if there's saved data
+                if (currentSavedLocation != null && !currentSavedLocation.trim().isEmpty()) {
+                    editCurrentLocation();
+                }
+            }
+        });
     }
     
     private void loadSavedLocation() {
@@ -227,6 +355,7 @@ public class ParkingInputDialogActivity extends Activity {
                 SQLiteDatabase.OPEN_READONLY
             );
             
+            // Load parking location
             Cursor cursor = db.query(
                 "catalystLocalStorage",
                 new String[]{"value"},
@@ -241,30 +370,59 @@ public class ParkingInputDialogActivity extends Activity {
                 currentSavedLocation = cursor.getString(0);
                 Log.d(TAG, "Loaded location: " + currentSavedLocation);
             }
-            
             cursor.close();
+            
+            // Load timestamp
+            Cursor timestampCursor = db.query(
+                "catalystLocalStorage",
+                new String[]{"value"},
+                "key = ?",
+                new String[]{"parkingLocationTimestamp"},
+                null,
+                null,
+                null
+            );
+            
+            if (timestampCursor.moveToFirst()) {
+                savedTimestamp = Long.parseLong(timestampCursor.getString(0));
+                Log.d(TAG, "Loaded timestamp: " + savedTimestamp);
+            }
+            timestampCursor.close();
+            
             db.close();
             
         } catch (Exception e) {
             Log.e(TAG, "Error reading from AsyncStorage: " + e.getMessage());
-            currentSavedLocation = "없음";
+            currentSavedLocation = null;
+            savedTimestamp = 0;
         }
     }
     
     private void updateUI() {
-        currentLocationText.setText(currentSavedLocation);
+        // Display "없음" only in UI if no data exists
+        currentLocationText.setText(currentSavedLocation != null ? currentSavedLocation : "아래 입력창에 위치를 입력후 저장해주세요.");
         
         // Show/hide buttons based on whether there's saved data
-        boolean hasSavedData = !currentSavedLocation.equals("없음");
+        boolean hasSavedData = currentSavedLocation != null && !currentSavedLocation.trim().isEmpty();
         editButton.setVisibility(hasSavedData ? View.VISIBLE : View.GONE);
         deleteButton.setVisibility(hasSavedData ? View.VISIBLE : View.GONE);
+        
+        // Update background based on whether location text is clickable
+        if (hasSavedData) {
+            currentLocationText.setBackgroundResource(R.drawable.location_highlight_clickable);
+        } else {
+            currentLocationText.setBackgroundResource(R.drawable.location_highlight);
+        }
+        
+        // Update timestamp display
+        updateTimestampDisplay();
         
         // Ensure we're not in editing mode initially
         setEditingMode(false);
     }
     
     private void editCurrentLocation() {
-        if (!currentSavedLocation.equals("없음")) {
+        if (currentSavedLocation != null && !currentSavedLocation.trim().isEmpty()) {
             // Parse the saved location
             String[] parts = currentSavedLocation.split(" ");
             if (parts.length >= 2) {
@@ -303,8 +461,13 @@ public class ParkingInputDialogActivity extends Activity {
             floorNumberInput.setBackgroundResource(R.drawable.input_editing_highlight);
             areaSectionInput.setBackgroundResource(R.drawable.input_editing_highlight);
         } else {
-            // Add highlight back to saved location
-            currentLocationText.setBackgroundResource(R.drawable.location_highlight);
+            // Add appropriate highlight back to saved location based on whether there's saved data
+            boolean hasSavedData = currentSavedLocation != null && !currentSavedLocation.trim().isEmpty();
+            if (hasSavedData) {
+                currentLocationText.setBackgroundResource(R.drawable.location_highlight_clickable);
+            } else {
+                currentLocationText.setBackgroundResource(R.drawable.location_highlight);
+            }
             
             // Remove highlight from input fields
             floorNumberInput.setBackgroundResource(R.drawable.input_underline);
@@ -336,6 +499,7 @@ public class ParkingInputDialogActivity extends Activity {
             );
             
             db.delete("catalystLocalStorage", "key = ?", new String[]{"parkingLocation"});
+            db.delete("catalystLocalStorage", "key = ?", new String[]{"parkingLocationTimestamp"});
             db.close();
             
             // Update widgets
@@ -385,12 +549,18 @@ public class ParkingInputDialogActivity extends Activity {
                 SQLiteDatabase.OPEN_READWRITE
             );
             
-            ContentValues values = new ContentValues();
-            values.put("key", "parkingLocation");
-            values.put("value", combinedLocation);
+            ContentValues locationValues = new ContentValues();
+            locationValues.put("key", "parkingLocation");
+            locationValues.put("value", combinedLocation);
             
-            // Insert or replace
-            db.insertWithOnConflict("catalystLocalStorage", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+            // Save timestamp
+            ContentValues timestampValues = new ContentValues();
+            timestampValues.put("key", "parkingLocationTimestamp");
+            timestampValues.put("value", String.valueOf(System.currentTimeMillis()));
+            
+            // Insert or replace both location and timestamp
+            db.insertWithOnConflict("catalystLocalStorage", null, locationValues, SQLiteDatabase.CONFLICT_REPLACE);
+            db.insertWithOnConflict("catalystLocalStorage", null, timestampValues, SQLiteDatabase.CONFLICT_REPLACE);
             db.close();
             
             // Update widgets

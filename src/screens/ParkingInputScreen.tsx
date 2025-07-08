@@ -5,7 +5,6 @@ import {
   TextInput,
   StyleSheet,
   Alert,
-  NativeModules,
   BackHandler,
   TouchableOpacity,
   KeyboardAvoidingView,
@@ -14,10 +13,12 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors } from '../constants/colors';
+import ParkingIcon from '../components/ParkingIcon';
 
 export default function ParkingInputScreen() {
-  const [currentSavedLocation, setCurrentSavedLocation] =
-    useState<string>('없음');
+  const [currentSavedLocation, setCurrentSavedLocation] = useState<
+    string | undefined
+  >(undefined);
   const [floorType, setFloorType] = useState<'지하' | '지상'>('지하');
   const [floorNumber, setFloorNumber] = useState<string>('');
   const [areaSection, setAreaSection] = useState<string>('');
@@ -40,16 +41,15 @@ export default function ParkingInputScreen() {
   const loadSavedLocation = async () => {
     try {
       const savedData = await AsyncStorage.getItem('parkingLocation');
-      if (savedData) {
-        setCurrentSavedLocation(savedData);
-      }
+      setCurrentSavedLocation(savedData || undefined);
     } catch (err) {
       console.error('저장된 위치 로드 오류:', err);
+      setCurrentSavedLocation(undefined);
     }
   };
 
   const editCurrentLocation = () => {
-    if (currentSavedLocation && currentSavedLocation !== '없음') {
+    if (currentSavedLocation) {
       const parts = currentSavedLocation.split(' ');
       if (parts.length >= 2) {
         const floorTypeFromSaved = parts[0] as '지하' | '지상';
@@ -77,7 +77,8 @@ export default function ParkingInputScreen() {
         onPress: async () => {
           try {
             await AsyncStorage.removeItem('parkingLocation');
-            setCurrentSavedLocation('없음');
+            await AsyncStorage.removeItem('parkingLocationTimestamp');
+            setCurrentSavedLocation(undefined);
 
             Alert.alert('삭제 완료', '저장된 주차 위치가 삭제되었습니다.');
           } catch (err) {
@@ -100,6 +101,11 @@ export default function ParkingInputScreen() {
 
     try {
       await AsyncStorage.setItem('parkingLocation', combinedLocation);
+      // Save timestamp for consistency with Android
+      await AsyncStorage.setItem(
+        'parkingLocationTimestamp',
+        String(Date.now()),
+      );
       setCurrentSavedLocation(combinedLocation);
 
       // Reset editing mode after successful save
@@ -143,20 +149,23 @@ export default function ParkingInputScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Current saved location display - Enhanced */}
+        <Text style={styles.descriptionText}>
+          주차 메모는 <Text style={styles.descriptionTextBold}>위젯</Text>으로
+          이용하시면 더 편리합니다!
+        </Text>
         <View style={styles.currentLocationContainer}>
           <View style={styles.locationHeaderContainer}>
-            <Text style={styles.locationIcon}>🚗</Text>
+            <ParkingIcon width={36} height={36} color={Colors.blue} />
             <Text style={styles.currentLocationLabel}>현재 저장된 위치</Text>
           </View>
           <View style={styles.locationValueContainer}>
             <Text style={styles.currentLocationText}>
-              {currentSavedLocation}
+              {currentSavedLocation || '없음'}
             </Text>
           </View>
 
           {/* Edit and Remove buttons - only show if there's saved data */}
-          {currentSavedLocation && currentSavedLocation !== '없음' ? (
+          {currentSavedLocation ? (
             <View style={styles.actionButtonsContainer}>
               <TouchableOpacity
                 style={styles.actionButton}
@@ -299,7 +308,18 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     paddingBottom: 40,
   },
-
+  descriptionText: {
+    fontSize: 14,
+    color: Colors.gray,
+    fontWeight: '500',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  descriptionTextBold: {
+    fontWeight: 'bold',
+    color: Colors.white,
+    backgroundColor: Colors.blue,
+  },
   currentLocationContainer: {
     backgroundColor: Colors.lightGray,
     padding: 20,
@@ -321,10 +341,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
-  },
-  locationIcon: {
-    fontSize: 20,
-    marginRight: 8,
+    gap: 2,
   },
   currentLocationLabel: {
     fontSize: 16,

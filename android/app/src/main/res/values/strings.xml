@@ -1,6 +1,7 @@
 <resources>
-    <string name="app_name">차 어딨지?</string>
+    <string name="app_name">주차 메모</string>
     <string name="widget_description">주차 위치를 홈 화면에 표시합니다</string>
     <string name="widget_medium_description">주차 위치 (가로형 2x1)</string>
     <string name="widget_square_description">주차 위치 (정사각형 2x2)</string>
+    
 </resources>
