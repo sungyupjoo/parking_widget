@@ -79,11 +79,6 @@ export default function ParkingInputScreen() {
             await AsyncStorage.removeItem('parkingLocation');
             setCurrentSavedLocation('없음');
 
-            // Update widget
-            if (NativeModules.WidgetUpdateModule) {
-              NativeModules.WidgetUpdateModule.updateWidget();
-            }
-
             Alert.alert('삭제 완료', '저장된 주차 위치가 삭제되었습니다.');
           } catch (err) {
             console.error('삭제 오류:', err);
@@ -96,7 +91,7 @@ export default function ParkingInputScreen() {
 
   const saveLocation = async () => {
     if (!isSaveEnabled) {
-      Alert.alert('알림', '지하/지상과 층수를 모두 선택해주세요.');
+      Alert.alert('알림', '층수를 입력해주세요.');
       return;
     }
 
@@ -107,16 +102,12 @@ export default function ParkingInputScreen() {
       await AsyncStorage.setItem('parkingLocation', combinedLocation);
       setCurrentSavedLocation(combinedLocation);
 
-      if (NativeModules.WidgetUpdateModule) {
-        NativeModules.WidgetUpdateModule.updateWidget();
-      }
-
       // Reset editing mode after successful save
       setIsEditingMode(false);
 
       Alert.alert(
         '저장 완료',
-        `${combinedLocation}로 저장되었습니다.\n위젯이 업데이트되었습니다.`,
+        `${combinedLocation}으로 저장되었습니다.\n위젯이 업데이트되었습니다.`,
         [
           {
             text: '취소',

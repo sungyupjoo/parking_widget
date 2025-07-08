@@ -9,21 +9,24 @@ import android.database.Cursor;
 import android.content.ContentValues;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.text.TextWatcher;
+import android.text.Editable;
 import android.util.Log;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 
 public class ParkingInputDialogActivity extends Activity {
     private static final String TAG = "ParkingInputDialog";
     
     private TextView currentLocationText;
-    private RadioGroup floorTypeRadioGroup;
-    private RadioButton floorTypeUnderground;
-    private RadioButton floorTypeAboveground;
+    private Button floorTypeUnderground;
+    private Button floorTypeAboveground;
     private EditText floorNumberInput;
     private EditText areaSectionInput;
     private Button saveButton;
@@ -32,11 +35,20 @@ public class ParkingInputDialogActivity extends Activity {
     private Button deleteButton;
     
     private String currentSavedLocation = "없음";
+    private boolean isUndergroundSelected = true;
+    private boolean isEditingMode = false;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        // Remove title bar
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        
         setContentView(R.layout.activity_parking_input_dialog);
+        
+        // Make dialog wider and adjust size
+        setupDialogWindow();
         
         // Initialize views
         initializeViews();
@@ -49,11 +61,44 @@ public class ParkingInputDialogActivity extends Activity {
         
         // Update UI based on saved location
         updateUI();
+        
+        // Apply enter animation
+        overridePendingTransition(R.anim.dialog_enter, 0);
+    }
+    
+    @Override
+    public void finish() {
+        super.finish();
+        // Apply exit animation
+        overridePendingTransition(0, R.anim.dialog_exit);
+    }
+    
+    @Override
+    public void onBackPressed() {
+        setEditingMode(false);
+        super.onBackPressed();
+        // Apply exit animation on back press
+        overridePendingTransition(0, R.anim.dialog_exit);
+    }
+    
+    private void setupDialogWindow() {
+        Window window = getWindow();
+        if (window != null) {
+            // Make background transparent
+            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            
+            WindowManager.LayoutParams params = window.getAttributes();
+            
+            // Make dialog wider - use 98% of screen width
+            params.width = (int) (getResources().getDisplayMetrics().widthPixels * 0.98);
+            params.height = WindowManager.LayoutParams.WRAP_CONTENT;
+            
+            window.setAttributes(params);
+        }
     }
     
     private void initializeViews() {
         currentLocationText = findViewById(R.id.current_location_text);
-        floorTypeRadioGroup = findViewById(R.id.floor_type_radio_group);
         floorTypeUnderground = findViewById(R.id.floor_type_underground);
         floorTypeAboveground = findViewById(R.id.floor_type_aboveground);
         floorNumberInput = findViewById(R.id.floor_number_input);
@@ -62,6 +107,84 @@ public class ParkingInputDialogActivity extends Activity {
         cancelButton = findViewById(R.id.cancel_button);
         editButton = findViewById(R.id.edit_button);
         deleteButton = findViewById(R.id.delete_button);
+        
+        // Set up toggle buttons
+        setupToggleButtons();
+        
+        setupFloorNumberFormatting();
+    }
+    
+    private void setupToggleButtons() {
+        // Default selection: underground
+        selectFloorType(true);
+        
+        floorTypeUnderground.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectFloorType(true);
+            }
+        });
+        
+        floorTypeAboveground.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectFloorType(false);
+            }
+        });
+    }
+    
+    private void selectFloorType(boolean isUnderground) {
+        isUndergroundSelected = isUnderground;
+        
+        if (isUnderground) {
+            floorTypeUnderground.setBackgroundResource(R.drawable.toggle_selected);
+            floorTypeUnderground.setTextColor(getResources().getColor(android.R.color.black));
+            floorTypeAboveground.setBackgroundResource(android.R.color.transparent);
+            floorTypeAboveground.setTextColor(getResources().getColor(android.R.color.darker_gray));
+        } else {
+            floorTypeAboveground.setBackgroundResource(R.drawable.toggle_selected);
+            floorTypeAboveground.setTextColor(getResources().getColor(android.R.color.black));
+            floorTypeUnderground.setBackgroundResource(android.R.color.transparent);
+            floorTypeUnderground.setTextColor(getResources().getColor(android.R.color.darker_gray));
+        }
+    }
+    
+    private void setupFloorNumberFormatting() {
+        floorNumberInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Not needed
+            }
+            
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Not needed
+            }
+            
+            @Override
+            public void afterTextChanged(Editable s) {
+                String input = s.toString();
+                
+                // Remove any existing "층" first
+                if (input.endsWith("층")) {
+                    input = input.substring(0, input.length() - 1);
+                }
+                
+                // Check if input contains only numbers
+                if (!input.isEmpty() && input.matches("\\d+")) {
+                    // Add "층" suffix
+                    String formatted = input + "층";
+                    
+                    // Only update if it's different to avoid infinite loop
+                    if (!formatted.equals(s.toString())) {
+                        floorNumberInput.removeTextChangedListener(this);
+                        floorNumberInput.setText(formatted);
+                        floorNumberInput.setSelection(formatted.length() - 1); // Position cursor before "층"
+                        floorNumberInput.addTextChangedListener(this);
+                    }
+                }
+            }
+        });
     }
     
     private void setupListeners() {
@@ -75,6 +198,7 @@ public class ParkingInputDialogActivity extends Activity {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                setEditingMode(false);
                 finish();
             }
         });
@@ -134,6 +258,9 @@ public class ParkingInputDialogActivity extends Activity {
         boolean hasSavedData = !currentSavedLocation.equals("없음");
         editButton.setVisibility(hasSavedData ? View.VISIBLE : View.GONE);
         deleteButton.setVisibility(hasSavedData ? View.VISIBLE : View.GONE);
+        
+        // Ensure we're not in editing mode initially
+        setEditingMode(false);
     }
     
     private void editCurrentLocation() {
@@ -143,11 +270,7 @@ public class ParkingInputDialogActivity extends Activity {
             if (parts.length >= 2) {
                 // Set floor type
                 String floorType = parts[0];
-                if (floorType.equals("지하")) {
-                    floorTypeUnderground.setChecked(true);
-                } else {
-                    floorTypeAboveground.setChecked(true);
-                }
+                selectFloorType(floorType.equals("지하"));
                 
                 // Set floor number
                 String floorNumber = parts[1].replace("층", "");
@@ -163,6 +286,29 @@ public class ParkingInputDialogActivity extends Activity {
                     areaSectionInput.setText(areaBuilder.toString());
                 }
             }
+        }
+        
+        // Enter editing mode
+        setEditingMode(true);
+    }
+    
+    private void setEditingMode(boolean isEditing) {
+        isEditingMode = isEditing;
+        
+        if (isEditing) {
+            // Remove highlight from saved location
+            currentLocationText.setBackgroundResource(android.R.color.transparent);
+            
+            // Highlight input fields
+            floorNumberInput.setBackgroundResource(R.drawable.input_editing_highlight);
+            areaSectionInput.setBackgroundResource(R.drawable.input_editing_highlight);
+        } else {
+            // Add highlight back to saved location
+            currentLocationText.setBackgroundResource(R.drawable.location_highlight);
+            
+            // Remove highlight from input fields
+            floorNumberInput.setBackgroundResource(R.drawable.input_underline);
+            areaSectionInput.setBackgroundResource(R.drawable.input_underline);
         }
     }
     
@@ -197,6 +343,7 @@ public class ParkingInputDialogActivity extends Activity {
             ParkingWidgetSquareProvider.updateAllWidgets(this);
             
             Toast.makeText(this, "저장된 주차 위치가 삭제되었습니다.", Toast.LENGTH_SHORT).show();
+            setEditingMode(false);
             finish();
             
         } catch (Exception e) {
@@ -207,16 +354,13 @@ public class ParkingInputDialogActivity extends Activity {
     
     private void saveLocation() {
         // Get floor type
-        String floorType = "";
-        int selectedId = floorTypeRadioGroup.getCheckedRadioButtonId();
-        if (selectedId == R.id.floor_type_underground) {
-            floorType = "지하";
-        } else if (selectedId == R.id.floor_type_aboveground) {
-            floorType = "지상";
-        }
+        String floorType = isUndergroundSelected ? "지하" : "지상";
         
-        // Get floor number
+        // Get floor number (remove "층" suffix if present)
         String floorNumber = floorNumberInput.getText().toString().trim();
+        if (floorNumber.endsWith("층")) {
+            floorNumber = floorNumber.substring(0, floorNumber.length() - 1);
+        }
         
         // Get area section
         String areaSection = areaSectionInput.getText().toString().trim();
@@ -253,7 +397,8 @@ public class ParkingInputDialogActivity extends Activity {
             ParkingWidgetMediumProvider.updateAllWidgets(this);
             ParkingWidgetSquareProvider.updateAllWidgets(this);
             
-            Toast.makeText(this, combinedLocation + "로 저장되었습니다.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, combinedLocation + "으로 저장되었습니다.", Toast.LENGTH_SHORT).show();
+            setEditingMode(false);
             finish();
             
         } catch (Exception e) {

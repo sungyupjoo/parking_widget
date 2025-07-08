@@ -1,43 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="24dp"
-    android:background="@android:color/white">
+    android:layout_height="wrap_content"
+    android:padding="12dp"
+    android:background="@drawable/dialog_background"
+    android:layout_margin="2dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Title -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="🚗 주차 위치 입력"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="#333333"
-            android:gravity="center"
-            android:layout_marginBottom="24dp" />
-
         <!-- Current Location Card -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@drawable/widget_background_gray"
-            android:padding="16dp"
-            android:layout_marginBottom="24dp">
+            android:padding="0dp"
+            android:layout_marginBottom="16dp">
 
-            <TextView
+            <!-- Title with Action Buttons -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="현재 저장된 위치"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="#666666"
-                android:layout_marginBottom="8dp" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="🚗 현재 저장된 위치"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#666666" />
+
+                <Button
+                    android:id="@+id/edit_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="✏️ 편집"
+                    android:textSize="12sp"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/button_text_only"
+                    android:textColor="#666666"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/delete_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🗑️ 삭제"
+                    android:textSize="12sp"
+                    android:textColor="#d32f2f"
+                    android:background="@drawable/button_text_only"
+                    android:visibility="gone" />
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/current_location_text"
@@ -47,117 +67,81 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="#000000"
-                android:layout_marginBottom="12dp" />
-
-            <!-- Action Buttons -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/edit_button"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="✏️ 편집"
-                    android:textSize="12sp"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/widget_background"
-                    android:visibility="gone" />
-
-                <Button
-                    android:id="@+id/delete_button"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="🗑️ 삭제"
-                    android:textSize="12sp"
-                    android:textColor="#d32f2f"
-                    android:background="@drawable/widget_background"
-                    android:visibility="gone" />
-
-            </LinearLayout>
+                android:background="@drawable/location_highlight"
+                android:padding="10dp"
+                android:layout_marginBottom="8dp" />
 
         </LinearLayout>
 
-        <!-- Floor Type Selection -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="지하/지상 선택"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#333333"
-            android:layout_marginBottom="8dp" />
-
-        <RadioGroup
-            android:id="@+id/floor_type_radio_group"
+        <!-- Parking Location Input Row -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="24dp">
+            android:layout_marginBottom="20dp">
 
-            <RadioButton
-                android:id="@+id/floor_type_underground"
+            <!-- Floor Type Selection -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/toggle_background"
+                android:orientation="horizontal"
+                android:padding="4dp">
+
+                <Button
+                    android:id="@+id/floor_type_underground"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="지하"
+                    android:textSize="14sp"
+                    android:textColor="#333333"
+                    android:background="@drawable/toggle_selected"
+                    android:padding="8dp" />
+
+                <Button
+                    android:id="@+id/floor_type_aboveground"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="지상"
+                    android:textSize="14sp"
+                    android:textColor="#666666"
+                    android:background="@android:color/transparent"
+                    android:padding="8dp" />
+
+            </LinearLayout>
+
+            <!-- Floor Number Input -->
+            <EditText
+                android:id="@+id/floor_number_input"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="지하"
+                android:hint="층"
+                android:inputType="number"
                 android:textSize="16sp"
-                android:checked="true" />
+                android:padding="12dp"
+                android:background="@drawable/input_underline"
+                android:layout_marginEnd="8dp"
+                android:gravity="center"
+                android:textAlignment="center" />
 
-            <RadioButton
-                android:id="@+id/floor_type_aboveground"
+            <!-- Area Section Input -->
+            <EditText
+                android:id="@+id/area_section_input"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="지상"
-                android:textSize="16sp" />
+                android:layout_weight="2"
+                android:hint="구역(선택)"
+                android:inputType="text"
+                android:textSize="16sp"
+                android:padding="12dp"
+                android:background="@drawable/input_underline" />
 
-        </RadioGroup>
-
-        <!-- Floor Number Input -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="층수 입력"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#333333"
-            android:layout_marginBottom="8dp" />
-
-        <EditText
-            android:id="@+id/floor_number_input"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="예: 3"
-            android:inputType="number"
-            android:textSize="16sp"
-            android:padding="16dp"
-            android:background="@drawable/widget_background"
-            android:layout_marginBottom="24dp" />
-
-        <!-- Area Section Input -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="구역/섹션 (선택사항)"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#333333"
-            android:layout_marginBottom="8dp" />
-
-        <EditText
-            android:id="@+id/area_section_input"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="예: A구역, 기둥 근처"
-            android:inputType="text"
-            android:textSize="16sp"
-            android:padding="16dp"
-            android:background="@drawable/widget_background"
-            android:layout_marginBottom="32dp" />
+        </LinearLayout>
 
         <!-- Action Buttons -->
         <LinearLayout
@@ -173,7 +157,7 @@
                 android:text="취소"
                 android:textSize="16sp"
                 android:layout_marginEnd="8dp"
-                android:background="@drawable/widget_background"
+                android:background="@drawable/button_text_only"
                 android:textColor="#666666" />
 
             <Button
@@ -184,7 +168,7 @@
                 android:text="저장"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:background="@drawable/widget_background"
+                android:background="@drawable/button_text_only"
                 android:textColor="#1976d2" />
 
         </LinearLayout>
