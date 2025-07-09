@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="위치 정보 없음"
+            android:text="위치 정보없음"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:textStyle="bold"

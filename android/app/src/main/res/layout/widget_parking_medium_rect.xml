@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/widget_background_white"
-    android:padding="10dp"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background_rounded"
     android:orientation="vertical"
-    android:gravity="center">
+    android:padding="12dp">
 
+    <!-- 상단 행: 로고 + 앱 이름 (왼쪽) -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.6"
         android:orientation="horizontal"
-        android:gravity="left|center_vertical"
-        android:layout_marginBottom="16dp">
+        android:gravity="center_vertical">
 
+        <!-- 작은 로고 + 앱 이름 -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -21,8 +22,8 @@
             android:gravity="center_vertical">
 
             <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
                 android:src="@drawable/ic_parking_logo"
                 android:layout_marginEnd="6dp" />
 
@@ -30,67 +31,47 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="주차 메모"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#000000"
-                android:gravity="left" />
+                android:textColor="#E0E0E0"
+                android:textSize="11sp"
+                android:textStyle="normal" />
 
         </LinearLayout>
 
     </LinearLayout>
 
-    <!-- Main parking location text -->
+    <!-- 하단 행: 시간 + 위치 정보 (수직으로 가깝게) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="@drawable/widget_content_background_blue"
-        android:padding="16dp"
+        android:layout_weight="1.4"
         android:orientation="vertical"
-        android:gravity="center">
+        android:gravity="bottom|start">
 
-        <TextView
-            android:id="@+id/parking_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="위치 정보 없음"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF"
-            android:gravity="center"
-            android:maxLines="3"
-            android:ellipsize="end"
-            android:lineSpacingExtra="4dp"
-            android:layout_marginBottom="6dp" />
-
-        <!-- Saved time within main content area -->
+        <!-- 저장 시간 -->
         <TextView
             android:id="@+id/saved_time_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text=""
-            android:textColor="#E0E0E0"
-            android:textSize="14sp"
-            android:gravity="center"
-            android:visibility="gone" />
-
-    </LinearLayout>
-
-    <!-- Footer instruction -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginTop="10dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:text="터치하여 위치 입력"
-            android:textSize="14sp"
-            android:textColor="#888888"
-            android:gravity="center" />
+            android:textColor="#E0E0E0"
+            android:textSize="10sp"
+            android:gravity="start"
+            android:visibility="visible"
+            android:layout_marginBottom="4dp" />
+
+        <!-- 위치 정보 (더 크고 뚜렷하게) -->
+        <TextView
+            android:id="@+id/parking_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:text="위치 정보 없음"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:gravity="start"
+            android:lineSpacingExtra="2dp" />
 
     </LinearLayout>
 

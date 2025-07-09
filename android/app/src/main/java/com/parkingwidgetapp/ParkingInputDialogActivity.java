@@ -553,9 +553,7 @@ public class ParkingInputDialogActivity extends Activity {
             ParkingWidgetMediumProvider.updateAllWidgets(this);
             ParkingWidgetSquareProvider.updateAllWidgets(this);
             ParkingWidgetWideProvider.updateAllWidgets(this);
-            ParkingWidgetExtraWideProvider.updateAllWidgets(this);
             ParkingWidgetMediumRectProvider.updateAllWidgets(this);
-            ParkingWidgetLargeProvider.updateAllWidgets(this);
             
             Toast.makeText(this, "저장된 주차 메모가 삭제되었습니다.", Toast.LENGTH_SHORT).show();
             setEditingMode(false);
@@ -636,9 +634,7 @@ public class ParkingInputDialogActivity extends Activity {
             ParkingWidgetMediumProvider.updateAllWidgets(this);
             ParkingWidgetSquareProvider.updateAllWidgets(this);
             ParkingWidgetWideProvider.updateAllWidgets(this);
-            ParkingWidgetExtraWideProvider.updateAllWidgets(this);
             ParkingWidgetMediumRectProvider.updateAllWidgets(this);
-            ParkingWidgetLargeProvider.updateAllWidgets(this);
             
             Toast.makeText(this, combinedLocation + "으로 저장되었습니다.", Toast.LENGTH_SHORT).show();
             setEditingMode(false);
