@@ -1,49 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/widget_background_rounded"
-    android:orientation="vertical"
-    android:padding="8dp">
+    android:layout_height="wrap_content"
+    android:background="@drawable/widget_background_square"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp"
+    android:paddingTop="40dp"
+    android:paddingBottom="40dp">
 
-    <!-- 상단 행: 로고 + 앱 이름 (왼쪽) -->
+    <!-- 왼쪽: 로고 -->
+    <ImageView
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:src="@drawable/ic_parking_logo"
+        android:background="@drawable/circle_background"
+        android:padding="2dp"
+        android:layout_marginEnd="6dp" />
+
+    <!-- 오른쪽: 위치 정보 및 시간 -->
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_weight="1"
-        android:orientation="horizontal"
-        >
-
-        <!-- 작은 로고 + 앱 이름 -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_parking_logo"
-                android:layout_marginEnd="4dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="주차 메모"
-                android:textColor="#E0E0E0"
-                android:textSize="16sp"
-                android:textStyle="normal" />
-
-        </LinearLayout>
-    </LinearLayout>
-
-    <!-- 하단 행: 시간 + 위치 정보 (수직으로 가깝게) -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:gravity="bottom|start">
+        android:gravity="start">
+
+        <!-- 위치 정보 -->
+        <TextView
+            android:id="@+id/parking_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:text="위치정보 없음"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:gravity="start"
+            android:layout_marginBottom="2dp"
+            android:lineSpacingExtra="2dp" />
 
         <!-- 저장 시간 -->
         <TextView
@@ -54,21 +51,8 @@
             android:textColor="#E0E0E0"
             android:textSize="12sp"
             android:gravity="start"
-            android:visibility="visible"
-            android:layout_marginBottom="4dp" />
+            android:visibility="visible" />
 
-        <!-- 위치 정보 (더 크고 뚜렷하게) -->
-        <TextView
-            android:id="@+id/parking_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="2"
-            android:text="위치 정보 없음"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:gravity="start"
-            android:lineSpacingExtra="1dp" />
     </LinearLayout>
+
 </LinearLayout>

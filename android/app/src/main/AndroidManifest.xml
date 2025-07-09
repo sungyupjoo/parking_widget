@@ -63,17 +63,5 @@
           <meta-data android:name="android.appwidget.provider"
               android:resource="@xml/parking_widget_wide_info" />
       </receiver>
-      
-      
-      <!-- Medium Rectangle 3x2 Widget -->
-      <receiver android:name=".ParkingWidgetMediumRectProvider"
-          android:exported="true">
-          <intent-filter>
-              <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-          </intent-filter>
-          <meta-data android:name="android.appwidget.provider"
-              android:resource="@xml/parking_widget_medium_rect_info" />
-      </receiver>
-      
     </application>
 </manifest>
