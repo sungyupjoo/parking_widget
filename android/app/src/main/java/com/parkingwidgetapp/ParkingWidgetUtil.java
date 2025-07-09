@@ -90,7 +90,7 @@ public class ParkingWidgetUtil {
             Intent intent = new Intent(context, ParkingInputDialogActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-            views.setOnClickPendingIntent(R.id.parking_text, pendingIntent);
+            views.setOnClickPendingIntent(R.id.widget, pendingIntent);
 
             appWidgetManager.updateAppWidget(widgetId, views);
         }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/widget_background_square"
@@ -12,8 +13,8 @@
 
     <!-- 왼쪽: 로고 -->
     <ImageView
-        android:layout_width="52dp"
-        android:layout_height="52dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:src="@drawable/ic_parking_logo"
         android:background="@drawable/circle_background"
         android:padding="2dp"
@@ -36,7 +37,7 @@
             android:maxLines="2"
             android:text="위치정보 없음"
             android:textColor="#FFFFFF"
-            android:textSize="18sp"
+            android:textSize="14sp"
             android:textStyle="bold"
             android:gravity="start"
             android:layout_marginBottom="2dp"
@@ -49,7 +50,7 @@
             android:layout_height="wrap_content"
             android:text="터치하여 위치 입력"
             android:textColor="#E0E0E0"
-            android:textSize="12sp"
+            android:textSize="10sp"
             android:gravity="start"
             android:visibility="visible" />
 
