@@ -477,8 +477,8 @@ public class ParkingInputDialogActivity extends Activity {
     
     private void deleteCurrentLocation() {
         new AlertDialog.Builder(this)
-            .setTitle("위치 삭제")
-            .setMessage("저장된 주차 위치를 삭제하시겠습니까?")
+            .setTitle("주차 메모 삭제")
+            .setMessage("저장된 주차 메모를 삭제하시겠습니까?")
             .setPositiveButton("삭제", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -505,8 +505,12 @@ public class ParkingInputDialogActivity extends Activity {
             // Update widgets
             ParkingWidgetMediumProvider.updateAllWidgets(this);
             ParkingWidgetSquareProvider.updateAllWidgets(this);
+            ParkingWidgetWideProvider.updateAllWidgets(this);
+            ParkingWidgetExtraWideProvider.updateAllWidgets(this);
+            ParkingWidgetMediumRectProvider.updateAllWidgets(this);
+            ParkingWidgetLargeProvider.updateAllWidgets(this);
             
-            Toast.makeText(this, "저장된 주차 위치가 삭제되었습니다.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "저장된 주차 메모가 삭제되었습니다.", Toast.LENGTH_SHORT).show();
             setEditingMode(false);
             finish();
             
@@ -531,7 +535,7 @@ public class ParkingInputDialogActivity extends Activity {
         
         // Validate input
         if (floorType.isEmpty() || floorNumber.isEmpty()) {
-            Toast.makeText(this, "지하/지상과 층수를 모두 선택해주세요.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "층수를 입력해주세요.", Toast.LENGTH_SHORT).show();
             return;
         }
         
@@ -566,6 +570,10 @@ public class ParkingInputDialogActivity extends Activity {
             // Update widgets
             ParkingWidgetMediumProvider.updateAllWidgets(this);
             ParkingWidgetSquareProvider.updateAllWidgets(this);
+            ParkingWidgetWideProvider.updateAllWidgets(this);
+            ParkingWidgetExtraWideProvider.updateAllWidgets(this);
+            ParkingWidgetMediumRectProvider.updateAllWidgets(this);
+            ParkingWidgetLargeProvider.updateAllWidgets(this);
             
             Toast.makeText(this, combinedLocation + "으로 저장되었습니다.", Toast.LENGTH_SHORT).show();
             setEditingMode(false);

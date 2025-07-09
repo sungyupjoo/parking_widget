@@ -10,5 +10,5 @@
     android:initialLayout="@layout/widget_parking_medium"
     android:resizeMode="horizontal"
     android:widgetCategory="home_screen"
-    android:previewImage="@mipmap/ic_launcher"
+    android:previewImage="@drawable/widget_preview_medium"
     android:description="@string/widget_medium_description" /> 

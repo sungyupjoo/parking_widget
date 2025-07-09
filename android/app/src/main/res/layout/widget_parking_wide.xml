@@ -4,17 +4,16 @@
     android:layout_height="match_parent"
     android:background="@drawable/widget_background_white"
     android:orientation="vertical"
-    android:paddingHorizontal="10dp">
+    android:paddingHorizontal="12dp">
 
-    <!-- 상단 헤더 (아이콘 + 타이틀 + 아이콘) -->
+    <!-- 상단 헤더 (아이콘 + 타이틀) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:paddingTop="12dp"
-        android:paddingBottom="6dp"
-        >
+        android:paddingBottom="6dp">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -27,20 +26,19 @@
                 android:layout_width="18dp"
                 android:layout_height="18dp"
                 android:src="@drawable/ic_parking_logo"
-                android:layout_marginEnd="2dp"
+                android:layout_marginEnd="4dp"
                 android:layout_marginTop="1dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="주차 메모"
-                android:textColor="#888888"
-                android:textSize="10sp"
+                android:textColor="#666666"
+                android:textSize="12sp"
                 android:textStyle="bold"
                 android:gravity="center_vertical" />
 
         </LinearLayout>
-
 
     </LinearLayout>
 
@@ -49,7 +47,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/widget_content_background_blue"
-        android:padding="8dp"
+        android:padding="10dp"
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
@@ -62,12 +60,11 @@
             android:maxLines="1"
             android:text="위치 정보 없음"
             android:textColor="#FFFFFF"
-            android:textSize="12sp"
+            android:textSize="14sp"
             android:textStyle="bold"
             android:gravity="center"
-            android:layout_marginEnd="6dp" />
+            android:layout_marginEnd="8dp" />
 
-        
     </LinearLayout>
 
     <!-- Footer instruction -->
@@ -76,28 +73,28 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
-        >
-    <!-- 저장 시간 -->
-    <TextView
-        android:id="@+id/saved_time_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="#999999"
-        android:textSize="10sp"
-        android:visibility="gone"
-        android:gravity="center"
-        android:layout_marginBottom="2dp"
-        />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="터치하여 위치 입력"
-        android:textSize="10sp"
-        android:textColor="#888888"
-        android:gravity="center" 
-        android:layout_marginTop="2dp"/>
+        android:layout_marginTop="4dp">
+
+        <!-- 저장 시간 -->
+        <TextView
+            android:id="@+id/saved_time_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#999999"
+            android:textSize="10sp"
+            android:visibility="gone"
+            android:gravity="center"
+            android:layout_marginBottom="2dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="터치하여 위치 입력"
+            android:textSize="10sp"
+            android:textColor="#888888"
+            android:gravity="center"
+            android:layout_marginTop="2dp" />
 
     </LinearLayout>
 
-   
 </LinearLayout>

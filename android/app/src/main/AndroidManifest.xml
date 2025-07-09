@@ -53,5 +53,45 @@
           <meta-data android:name="android.appwidget.provider"
               android:resource="@xml/parking_widget_square_info" />
       </receiver>
+      
+      <!-- Wide 3x1 Widget -->
+      <receiver android:name=".ParkingWidgetWideProvider"
+          android:exported="true">
+          <intent-filter>
+              <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+          </intent-filter>
+          <meta-data android:name="android.appwidget.provider"
+              android:resource="@xml/parking_widget_wide_info" />
+      </receiver>
+      
+      <!-- Extra Wide 4x1 Widget -->
+      <receiver android:name=".ParkingWidgetExtraWideProvider"
+          android:exported="true">
+          <intent-filter>
+              <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+          </intent-filter>
+          <meta-data android:name="android.appwidget.provider"
+              android:resource="@xml/parking_widget_extrawide_info" />
+      </receiver>
+      
+      <!-- Medium Rectangle 3x2 Widget -->
+      <receiver android:name=".ParkingWidgetMediumRectProvider"
+          android:exported="true">
+          <intent-filter>
+              <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+          </intent-filter>
+          <meta-data android:name="android.appwidget.provider"
+              android:resource="@xml/parking_widget_medium_rect_info" />
+      </receiver>
+      
+      <!-- Large 4x2 Widget -->
+      <receiver android:name=".ParkingWidgetLargeProvider"
+          android:exported="true">
+          <intent-filter>
+              <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+          </intent-filter>
+          <meta-data android:name="android.appwidget.provider"
+              android:resource="@xml/parking_widget_large_info" />
+      </receiver>
     </application>
 </manifest>
