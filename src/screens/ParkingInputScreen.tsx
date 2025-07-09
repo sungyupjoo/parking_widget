@@ -10,6 +10,8 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Platform,
+  Modal,
+  Dimensions,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors } from '../constants/colors';
@@ -23,6 +25,7 @@ export default function ParkingInputScreen() {
   const [floorNumber, setFloorNumber] = useState<string>('');
   const [areaSection, setAreaSection] = useState<string>('');
   const [isEditingMode, setIsEditingMode] = useState<boolean>(false);
+  const [showWidgetGuide, setShowWidgetGuide] = useState<boolean>(false);
 
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -136,12 +139,102 @@ export default function ParkingInputScreen() {
     }
   };
 
+  const WidgetGuideModal = () => (
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={showWidgetGuide}
+      onRequestClose={() => setShowWidgetGuide(false)}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContainer}>
+          <ScrollView style={styles.modalScrollView}>
+            <Text style={styles.modalTitle}>위젯 사용법</Text>
+
+            <View style={styles.guideSection}>
+              <Text style={styles.guideSectionTitle}>🎯 위젯이란?</Text>
+              <Text style={styles.guideText}>
+                홈화면에서 <Text style={styles.boldText}>앱을 열지 않고도</Text>{' '}
+                주차 위치를 <Text style={styles.boldText}>바로 확인</Text>할 수
+                있는 편리한 기능입니다.
+              </Text>
+            </View>
+
+            <View style={styles.guideSection}>
+              <Text style={styles.guideSectionTitle}>📋 Android 위젯 설치</Text>
+              <Text style={styles.guideStep}>
+                1. 홈화면 빈 공간을 길게 누르세요
+              </Text>
+              <Text style={styles.guideStep}>
+                2. 화면 아래에서 "위젯" 또는 "Widget" 메뉴를 선택하세요
+              </Text>
+              <Text style={styles.guideStep}>
+                3. 화면 상단의 검색창에 "주차 메모" 앱을 검색하여 선택하세요.
+              </Text>
+              <Text style={styles.guideStep}>
+                (화면 아래의 목록을 내려 "주차 메모" 앱을 선택하셔도 됩니다.)
+              </Text>
+              <Text style={styles.guideStep}>
+                4. 원하시는 크기와 디자인의 위젯을 선택하세요. 언제든지 바꾸실
+                수 있습니다!
+              </Text>
+              <Text style={styles.guideStep}>
+                5. 위젯의 위치를 옮기고 싶다면, 위젯을 길게 누르시고 원하시는
+                위치로 끌어주세요
+              </Text>
+            </View>
+
+            <View style={styles.guideSection}>
+              <Text style={styles.guideSectionTitle}>💡 사용 팁</Text>
+              <Text style={styles.guideText}>
+                • 위젯을 탭하면 앱으로 들어오시지 않고도 위치를 수정할 수
+                있습니다
+              </Text>
+              <Text style={styles.guideText}>
+                • 주차 위치를 저장하면 위젯이 자동으로 업데이트됩니다.
+              </Text>
+            </View>
+          </ScrollView>
+
+          <View style={styles.modalButtonContainer}>
+            <TouchableOpacity
+              style={styles.modalCloseButton}
+              onPress={() => setShowWidgetGuide(false)}
+            >
+              <Text style={styles.modalCloseButtonText}>닫기</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
     >
+      {/* Header Menu */}
+      <View style={styles.headerContainer}>
+        <View style={styles.headerTitleContainer}>
+          <ParkingIcon width={30} height={30} color={Colors.blue} />
+          <Text style={styles.headerTitle}>주차 메모</Text>
+        </View>
+
+        <TouchableOpacity
+          style={styles.headerDescriptionContainer}
+          onPress={() => setShowWidgetGuide(true)}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.descriptionText}>
+            주차 메모는 <Text style={styles.descriptionTextBold}>위젯</Text>으로
+            이용하시면 더 편리합니다!
+          </Text>
+          <Text style={styles.guideIcon}>위젯 사용법</Text>
+        </TouchableOpacity>
+      </View>
+
       <ScrollView
         ref={scrollViewRef}
         style={styles.scrollView}
@@ -149,14 +242,11 @@ export default function ParkingInputScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.descriptionText}>
-          주차 메모는 <Text style={styles.descriptionTextBold}>위젯</Text>으로
-          이용하시면 더 편리합니다!
-        </Text>
         <View style={styles.currentLocationContainer}>
           <View style={styles.locationHeaderContainer}>
-            <ParkingIcon width={36} height={36} color={Colors.blue} />
-            <Text style={styles.currentLocationLabel}>현재 저장된 위치</Text>
+            <Text style={styles.currentLocationLabel}>
+              마지막으로 저장한 위치
+            </Text>
           </View>
           <View style={styles.locationValueContainer}>
             <Text style={styles.currentLocationText}>
@@ -290,6 +380,8 @@ export default function ParkingInputScreen() {
           </Text>
         </View>
       </ScrollView>
+
+      <WidgetGuideModal />
     </KeyboardAvoidingView>
   );
 }
@@ -304,16 +396,15 @@ const styles = StyleSheet.create({
   },
   scrollContentContainer: {
     flexGrow: 1,
-    padding: 24,
-    paddingTop: 40,
-    paddingBottom: 40,
+    padding: 20,
+    paddingTop: 16,
+    paddingBottom: 32,
   },
   descriptionText: {
-    fontSize: 14,
+    fontSize: 13,
     color: Colors.gray,
     fontWeight: '500',
     textAlign: 'center',
-    marginBottom: 16,
   },
   descriptionTextBold: {
     fontWeight: 'bold',
@@ -322,9 +413,9 @@ const styles = StyleSheet.create({
   },
   currentLocationContainer: {
     backgroundColor: Colors.lightGray,
-    padding: 20,
+    padding: 16,
     borderRadius: 12,
-    marginBottom: 32,
+    marginBottom: 24,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#e9ecef',
@@ -392,21 +483,24 @@ const styles = StyleSheet.create({
   removeButtonText: {
     color: Colors.white,
   },
+  boldText: {
+    fontWeight: '800',
+  },
   label: {
-    fontSize: 20,
-    marginBottom: 16,
+    fontSize: 18,
+    marginBottom: 12,
     fontWeight: 'bold',
     color: Colors.darkGray,
   },
   floorTypeContainer: {
     flexDirection: 'row',
-    marginBottom: 20,
-    gap: 12,
+    marginBottom: 16,
+    gap: 10,
   },
   floorTypeButton: {
     flex: 1,
-    padding: 16,
-    borderRadius: 12,
+    padding: 12,
+    borderRadius: 10,
     borderWidth: 2,
     borderColor: '#e9ecef',
     backgroundColor: Colors.white,
@@ -442,7 +536,7 @@ const styles = StyleSheet.create({
   },
   // Input styling
   inputContainer: {
-    marginBottom: 20,
+    marginBottom: 16,
   },
   inputLabel: {
     fontSize: 16,
@@ -498,10 +592,10 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     backgroundColor: Colors.blue,
-    padding: 18,
-    borderRadius: 12,
+    padding: 16,
+    borderRadius: 10,
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: 12,
     shadowColor: Colors.shadow,
     shadowOffset: {
       width: 0,
@@ -531,5 +625,123 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginTop: 8,
     textAlign: 'center',
+  },
+  headerContainer: {
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 32,
+    paddingBottom: 8,
+    backgroundColor: Colors.white,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+    shadowColor: Colors.shadow,
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  headerTitleContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: Colors.darkGray,
+  },
+  headerDescriptionContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+    backgroundColor: Colors.lightGray,
+    marginTop: 6,
+    gap: 6,
+  },
+  guideIcon: {
+    fontSize: 13,
+    color: Colors.blue,
+    textDecorationLine: 'underline',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContainer: {
+    backgroundColor: Colors.white,
+    borderRadius: 16,
+    width: Dimensions.get('window').width * 0.9,
+    maxHeight: Dimensions.get('window').height * 0.8,
+    overflow: 'hidden',
+    shadowColor: Colors.shadow,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  modalScrollView: {
+    padding: 24,
+  },
+  modalButtonContainer: {
+    padding: 16,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#e9ecef',
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: Colors.darkGray,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  guideSection: {
+    marginBottom: 20,
+  },
+  guideSectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: Colors.darkGray,
+    marginBottom: 10,
+  },
+  guideText: {
+    fontSize: 16,
+    color: Colors.gray,
+    lineHeight: 24,
+    marginBottom: 10,
+  },
+  guideStep: {
+    fontSize: 16,
+    color: Colors.darkGray,
+    fontWeight: '500',
+    marginBottom: 5,
+  },
+  modalCloseButton: {
+    backgroundColor: Colors.blue,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  modalCloseButtonText: {
+    color: Colors.white,
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

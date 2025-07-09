@@ -11,7 +11,7 @@ export const Colors = {
   white: '#ffffff',
 
   // Background colors
-  background: '#f5f5f5',
+  background: '#FFFFFF',
 
   // Status colors
   disabled: '#6c757d',
