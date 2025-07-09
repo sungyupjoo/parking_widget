@@ -229,6 +229,7 @@ public class ParkingInputDialogActivity extends Activity {
         setupToggleButtons();
         
         setupFloorNumberFormatting();
+        setupAreaSectionValidation();
     }
     
     private void setupToggleButtons() {
@@ -289,6 +290,22 @@ public class ParkingInputDialogActivity extends Activity {
                 
                 // Check if input contains only numbers
                 if (!input.isEmpty() && input.matches("\\d+")) {
+                    // Validate floor number range (0-99)
+                    try {
+                        int floorNum = Integer.parseInt(input);
+                        if (floorNum > 99) {
+                            // Truncate to 99
+                            input = "99";
+                            Toast.makeText(ParkingInputDialogActivity.this, "층수는 99층까지 입력 가능합니다.", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (NumberFormatException e) {
+                        // Invalid number, clear input
+                        floorNumberInput.removeTextChangedListener(this);
+                        floorNumberInput.setText("");
+                        floorNumberInput.addTextChangedListener(this);
+                        return;
+                    }
+                    
                     // Add "층" suffix
                     String formatted = input + "층";
                     
@@ -299,6 +316,36 @@ public class ParkingInputDialogActivity extends Activity {
                         floorNumberInput.setSelection(formatted.length() - 1); // Position cursor before "층"
                         floorNumberInput.addTextChangedListener(this);
                     }
+                }
+            }
+        });
+    }
+    
+    private void setupAreaSectionValidation() {
+        areaSectionInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Not needed
+            }
+            
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Not needed
+            }
+            
+            @Override
+            public void afterTextChanged(Editable s) {
+                String input = s.toString();
+                
+                // Check if input exceeds 30 characters
+                if (input.length() > 30) {
+                    // Truncate to 30 characters
+                    String truncated = input.substring(0, 30);
+                    areaSectionInput.removeTextChangedListener(this);
+                    areaSectionInput.setText(truncated);
+                    areaSectionInput.setSelection(truncated.length()); // Position cursor at end
+                    areaSectionInput.addTextChangedListener(this);
+                    Toast.makeText(ParkingInputDialogActivity.this, "구역은 30자까지 입력 가능합니다.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -536,6 +583,24 @@ public class ParkingInputDialogActivity extends Activity {
         // Validate input
         if (floorType.isEmpty() || floorNumber.isEmpty()) {
             Toast.makeText(this, "층수를 입력해주세요.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        // Validate floor number range (0-99)
+        try {
+            int floorNum = Integer.parseInt(floorNumber);
+            if (floorNum < 0 || floorNum > 99) {
+                Toast.makeText(this, "층수는 0부터 99까지 입력 가능합니다.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "올바른 층수를 입력해주세요.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        // Validate area section length (max 30 characters)
+        if (areaSection.length() > 30) {
+            Toast.makeText(this, "구역은 30자까지 입력 가능합니다.", Toast.LENGTH_SHORT).show();
             return;
         }
         
