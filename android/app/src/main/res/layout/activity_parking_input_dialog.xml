@@ -43,7 +43,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text=" 마지막으로 저장된 주차 메모"
+                        android:text=" 주차 메모"
                         android:textSize="14sp"
                         android:textStyle="bold"
                         android:textColor="#666666" />
@@ -103,7 +103,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="✏️ 새 주차 메모 입력"
+            android:text="🚗 새 주차 메모 입력"
             android:textSize="14sp"
             android:textStyle="bold"
             android:textColor="#666666"

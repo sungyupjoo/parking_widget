@@ -161,7 +161,7 @@ export default function ParkingInputScreen() {
             </View>
 
             <View style={styles.guideSection}>
-              <Text style={styles.guideSectionTitle}>📋 Android 위젯 설치</Text>
+              <Text style={styles.guideSectionTitle}>📋 위젯 설치</Text>
               <Text style={styles.guideStep}>
                 1. 홈화면 빈 공간을 길게 누르세요
               </Text>
@@ -228,10 +228,10 @@ export default function ParkingInputScreen() {
           activeOpacity={0.7}
         >
           <Text style={styles.descriptionText}>
-            주차 메모는 <Text style={styles.descriptionTextBold}>위젯</Text>으로
-            이용하시면 더 편리합니다!
+            <Text style={styles.descriptionTextBold}>위젯</Text>으로 사용하시면
+            훨씬 편리합니다!
           </Text>
-          <Text style={styles.guideIcon}>위젯 사용법</Text>
+          <Text style={styles.guideIcon}>위젯 사용법 보기</Text>
         </TouchableOpacity>
       </View>
 
@@ -329,33 +329,35 @@ export default function ParkingInputScreen() {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>
-              층수 <Text style={styles.requiredMark}>필수</Text>
-            </Text>
-            <TextInput
-              style={styles.input}
-              placeholder="예: 2"
-              value={floorNumber}
-              onChangeText={setFloorNumber}
-              keyboardType="numeric"
-              returnKeyType="next"
-              onFocus={scrollToSaveButton}
-            />
-          </View>
+          <View style={styles.inputRowContainer}>
+            <View style={styles.inputContainerSmall}>
+              <Text style={styles.inputLabel}>
+                층수 <Text style={styles.requiredMark}>필수</Text>
+              </Text>
+              <TextInput
+                style={styles.input}
+                placeholder="예: 2"
+                value={floorNumber}
+                onChangeText={setFloorNumber}
+                keyboardType="numeric"
+                returnKeyType="next"
+                onFocus={scrollToSaveButton}
+              />
+            </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>
-              구역 <Text style={styles.optionalMark}>선택사항</Text>
-            </Text>
-            <TextInput
-              style={styles.input}
-              placeholder="예: A구역, 2D"
-              value={areaSection}
-              onChangeText={setAreaSection}
-              returnKeyType="done"
-              onFocus={scrollToSaveButton}
-            />
+            <View style={styles.inputContainerLarge}>
+              <Text style={styles.inputLabel}>
+                구역 <Text style={styles.optionalMark}>선택사항</Text>
+              </Text>
+              <TextInput
+                style={styles.input}
+                placeholder="예: A구역, 2D"
+                value={areaSection}
+                onChangeText={setAreaSection}
+                returnKeyType="done"
+                onFocus={scrollToSaveButton}
+              />
+            </View>
           </View>
 
           <TouchableOpacity
@@ -538,6 +540,17 @@ const styles = StyleSheet.create({
   inputContainer: {
     marginBottom: 16,
   },
+  inputRowContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 16,
+  },
+  inputContainerSmall: {
+    flex: 0.35,
+  },
+  inputContainerLarge: {
+    flex: 0.65,
+  },
   inputLabel: {
     fontSize: 16,
     color: Colors.gray,
@@ -665,7 +678,6 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 10,
     borderRadius: 6,
-    backgroundColor: Colors.lightGray,
     marginTop: 6,
     gap: 6,
   },
@@ -673,6 +685,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: Colors.blue,
     textDecorationLine: 'underline',
+    fontWeight: '700',
   },
   modalOverlay: {
     flex: 1,
@@ -728,8 +741,7 @@ const styles = StyleSheet.create({
   },
   guideStep: {
     fontSize: 16,
-    color: Colors.darkGray,
-    fontWeight: '500',
+    color: Colors.gray,
     marginBottom: 5,
   },
   modalCloseButton: {
