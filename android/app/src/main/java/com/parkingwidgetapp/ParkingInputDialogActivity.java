@@ -59,25 +59,14 @@ public class ParkingInputDialogActivity extends Activity {
         // Make dialog wider and adjust size
         setupDialogWindow();
         
-        // Initialize views
         initializeViews();
-        
-        // Load current saved location
         loadSavedLocation();
-        
-        // Set up listeners
         setupListeners();
-        
-        // Update UI based on saved location
         updateUI();
-        
-        // Apply enter animation
         overridePendingTransition(R.anim.dialog_enter, 0);
         
-        // Start real-time timestamp updates
         startTimestampUpdates();
         
-        // Auto-focus on floor number input and show keyboard
         if (floorNumberInput != null) {
             floorNumberInput.requestFocus();
             
@@ -288,15 +277,14 @@ public class ParkingInputDialogActivity extends Activity {
                     input = input.substring(0, input.length() - 1);
                 }
                 
-                // Check if input contains only numbers
-                if (!input.isEmpty() && input.matches("\\d+")) {
-                    // Validate floor number range (0-99)
+                // Check if input contains only numbers (including decimals)
+                if (!input.isEmpty() && input.matches("\\d+(\\.\\d*)?")) {
+                    // Validate floor number range (0-99.9)
                     try {
-                        int floorNum = Integer.parseInt(input);
+                        double floorNum = Double.parseDouble(input);
                         if (floorNum > 99) {
-                            // Truncate to 99
                             input = "99";
-                            Toast.makeText(ParkingInputDialogActivity.this, "층수는 99층까지 입력 가능합니다.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ParkingInputDialogActivity.this, "입력하신 층수를 확인해주세요", Toast.LENGTH_SHORT).show();
                         }
                     } catch (NumberFormatException e) {
                         // Invalid number, clear input
@@ -583,9 +571,15 @@ public class ParkingInputDialogActivity extends Activity {
             return;
         }
         
-        // Validate floor number range (0-99)
+        // Validate floor number format and range (0-99.9)
         try {
-            int floorNum = Integer.parseInt(floorNumber);
+            // Check if it ends with a decimal point (incomplete number)
+            if (floorNumber.endsWith(".")) {
+                Toast.makeText(this, "층수를 완전히 입력해주세요.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            
+            double floorNum = Double.parseDouble(floorNumber);
             if (floorNum < 0 || floorNum > 99) {
                 Toast.makeText(this, "층수는 0부터 99까지 입력 가능합니다.", Toast.LENGTH_SHORT).show();
                 return;
