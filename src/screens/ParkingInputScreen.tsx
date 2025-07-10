@@ -16,7 +16,6 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors } from '../constants/colors';
-import ParkingIcon from '../components/ParkingIcon';
 
 const { ParkingWidgetModule } = NativeModules;
 
@@ -260,7 +259,6 @@ export default function ParkingInputScreen() {
       {/* Header Menu */}
       <View style={styles.headerContainer}>
         <View style={styles.headerTitleContainer}>
-          <ParkingIcon width={30} height={30} color={Colors.blue} />
           <Text style={styles.headerTitle}>주차 메모</Text>
         </View>
 
