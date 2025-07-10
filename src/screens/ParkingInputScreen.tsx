@@ -12,10 +12,13 @@ import {
   Platform,
   Modal,
   Dimensions,
+  NativeModules,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors } from '../constants/colors';
 import ParkingIcon from '../components/ParkingIcon';
+
+const { ParkingWidgetModule } = NativeModules;
 
 export default function ParkingInputScreen() {
   const [currentSavedLocation, setCurrentSavedLocation] = useState<
@@ -83,6 +86,16 @@ export default function ParkingInputScreen() {
             await AsyncStorage.removeItem('parkingLocationTimestamp');
             setCurrentSavedLocation(undefined);
 
+            // Update Android widgets
+            try {
+              if (ParkingWidgetModule) {
+                await ParkingWidgetModule.updateWidgets();
+                console.log('위젯이 업데이트되었습니다.');
+              }
+            } catch (widgetError) {
+              console.error('위젯 업데이트 오류:', widgetError);
+            }
+
             Alert.alert('삭제 완료', '저장된 주차 위치가 삭제되었습니다.');
           } catch (err) {
             console.error('삭제 오류:', err);
@@ -129,6 +142,16 @@ export default function ParkingInputScreen() {
         String(Date.now()),
       );
       setCurrentSavedLocation(combinedLocation);
+
+      // Update Android widgets
+      try {
+        if (ParkingWidgetModule) {
+          await ParkingWidgetModule.updateWidgets();
+          console.log('위젯이 업데이트되었습니다.');
+        }
+      } catch (widgetError) {
+        console.error('위젯 업데이트 오류:', widgetError);
+      }
 
       // Reset editing mode after successful save
       setIsEditingMode(false);
