@@ -99,6 +99,25 @@ export default function ParkingInputScreen() {
       return;
     }
 
+    // Validate floor number format
+    const trimmedFloorNumber = floorNumber.trim();
+    if (trimmedFloorNumber.endsWith('.')) {
+      Alert.alert('알림', '층수를 완전히 입력해주세요(예: 2.5).');
+      return;
+    }
+
+    // Validate floor number range
+    try {
+      const floorNum = parseFloat(trimmedFloorNumber);
+      if (isNaN(floorNum) || floorNum < 0 || floorNum > 99) {
+        Alert.alert('알림', '층수는 0부터 99까지 입력 가능합니다.');
+        return;
+      }
+    } catch (err) {
+      Alert.alert('알림', '올바른 층수를 입력해주세요.');
+      return;
+    }
+
     // Combine the three inputs
     const combinedLocation = `${floorType} ${floorNumber}층 ${areaSection}`;
 
@@ -339,7 +358,7 @@ export default function ParkingInputScreen() {
                 placeholder="예: 2"
                 value={floorNumber}
                 onChangeText={setFloorNumber}
-                keyboardType="numeric"
+                keyboardType="decimal-pad"
                 returnKeyType="next"
                 onFocus={scrollToSaveButton}
               />

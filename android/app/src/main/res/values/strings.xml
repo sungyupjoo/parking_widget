@@ -1,10 +1,7 @@
 <resources>
     <string name="app_name">주차 메모</string>
     <string name="widget_description">주차 위치를 기록하고 홈 화면에서 바로 볼 수 있게 표시합니다</string>
-    <string name="widget_medium_description">주차 위치 (가로형 2x1)</string>
-    <string name="widget_square_description">주차 위치 (정사각형 2x2)</string>
-    <string name="widget_wide_description">주차 위치 (가로형 3x1)</string>
-    <string name="widget_extra_wide_description">주차 위치 (가로형 4x1)</string>
-    <string name="widget_large_description">주차 위치 (가로형 4x2)</string>
-    
+    <string name="widget_medium_description">주차 위치를 기록하고 홈 화면에서 바로 볼 수 있게 표시합니다 (가로형 2x1)</string>
+    <string name="widget_square_description">주차 위치를 기록하고 홈 화면에서 바로 볼 수 있게 표시합니다 (정사각형 2x2)</string>
+    <string name="widget_wide_description">주차 위치를 기록하고 홈 화면에서 바로 볼 수 있게 표시합니다 (가로형 3x1)</string>    
 </resources>
