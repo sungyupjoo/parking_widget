@@ -35,6 +35,9 @@ local.properties
 !debug.keystore
 .kotlin/
 
+# Keystore properties (contains sensitive information)
+keystore.properties
+
 # node.js
 #
 node_modules/
@@ -46,7 +49,7 @@ yarn-error.log
 # It is recommended to not store the screenshots in the git repo. Instead, use fastlane to re-generate the
 # screenshots whenever they are needed.
 # For more information about the recommended setup visit:
-# https://docs.fastlane.tools/best-practices/source-control/
+# https://docsgit.fastlane.tools/best-practices/source-control/
 
 **/fastlane/report.xml
 **/fastlane/Preview.html
