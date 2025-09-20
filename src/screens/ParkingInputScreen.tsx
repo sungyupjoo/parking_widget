@@ -13,6 +13,8 @@ import {
   Modal,
   Dimensions,
   NativeModules,
+  AppState,
+  DeviceEventEmitter,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors } from '../constants/colors';
@@ -43,10 +45,74 @@ export default function ParkingInputScreen() {
     loadSavedLocation();
   }, []);
 
+  // Add AppState listener to reload data when app comes back into focus
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState: string) => {
+      if (nextAppState === 'active') {
+        // App has come to the foreground, reload the saved location
+        loadSavedLocation();
+      }
+    };
+
+    const subscription = AppState.addEventListener(
+      'change',
+      handleAppStateChange,
+    );
+
+    return () => {
+      subscription?.remove();
+    };
+  }, []);
+
+  // Add listener for parking data changes from native side
+  useEffect(() => {
+    const eventListener = DeviceEventEmitter.addListener(
+      'parkingDataChanged',
+      () => {
+        console.log('Received parkingDataChanged event from native');
+        loadSavedLocation();
+      },
+    );
+
+    return () => {
+      eventListener.remove();
+    };
+  }, []);
+
   const loadSavedLocation = async () => {
     try {
+      // First try AsyncStorage
       const savedData = await AsyncStorage.getItem('parkingLocation');
       setCurrentSavedLocation(savedData || undefined);
+
+      // Also try to get data from native module to ensure consistency
+      if (
+        ParkingWidgetModule &&
+        ParkingWidgetModule.getCurrentParkingLocation
+      ) {
+        try {
+          const nativeData =
+            await ParkingWidgetModule.getCurrentParkingLocation();
+          if (nativeData.location && nativeData.location !== savedData) {
+            // Native data is different from AsyncStorage, use native data
+            console.log(
+              'Data mismatch detected, using native data:',
+              nativeData.location,
+            );
+            setCurrentSavedLocation(nativeData.location);
+            // Update AsyncStorage to match native data
+            await AsyncStorage.setItem('parkingLocation', nativeData.location);
+            if (nativeData.timestamp) {
+              await AsyncStorage.setItem(
+                'parkingLocationTimestamp',
+                String(nativeData.timestamp),
+              );
+            }
+          }
+        } catch (nativeError) {
+          console.log('Native method not available or failed:', nativeError);
+        }
+      }
     } catch (err) {
       console.error('저장된 위치 로드 오류:', err);
       setCurrentSavedLocation(undefined);

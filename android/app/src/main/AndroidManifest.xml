@@ -63,5 +63,13 @@
           <meta-data android:name="android.appwidget.provider"
               android:resource="@xml/parking_widget_wide_info" />
       </receiver>
+      
+      <!-- Midnight Update Receiver -->
+      <receiver android:name=".MidnightUpdateReceiver"
+          android:exported="false">
+          <intent-filter>
+              <action android:name="com.parkingwidgetapp.MIDNIGHT_UPDATE" />
+          </intent-filter>
+      </receiver>
     </application>
 </manifest>

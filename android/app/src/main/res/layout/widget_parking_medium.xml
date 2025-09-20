@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:text="터치하여 위치 입력"
             android:textColor="#E0E0E0"
-            android:textSize="10sp"
+            android:textSize="9sp"
             android:visibility="visible" />
 
     </LinearLayout>

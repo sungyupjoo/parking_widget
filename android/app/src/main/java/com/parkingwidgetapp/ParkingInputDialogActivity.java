@@ -23,6 +23,8 @@ import android.os.Looper;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.view.inputmethod.InputMethodManager;
+import com.facebook.react.ReactApplication;
+import com.facebook.react.bridge.ReactApplicationContext;
 
 public class ParkingInputDialogActivity extends Activity {
     private static final String TAG = "ParkingInputDialog";
@@ -533,14 +535,30 @@ public class ParkingInputDialogActivity extends Activity {
                 SQLiteDatabase.OPEN_READWRITE
             );
             
-            db.delete("catalystLocalStorage", "key = ?", new String[]{"parkingLocation"});
-            db.delete("catalystLocalStorage", "key = ?", new String[]{"parkingLocationTimestamp"});
-            db.close();
+            // Use transaction to ensure atomicity
+            db.beginTransaction();
+            try {
+                db.delete("catalystLocalStorage", "key = ?", new String[]{"parkingLocation"});
+                db.delete("catalystLocalStorage", "key = ?", new String[]{"parkingLocationTimestamp"});
+                
+                db.setTransactionSuccessful();
+            } finally {
+                db.endTransaction();
+                db.close();
+            }
             
             // Update widgets
             ParkingWidgetMediumProvider.updateAllWidgets(this);
             ParkingWidgetSquareProvider.updateAllWidgets(this);
             ParkingWidgetWideProvider.updateAllWidgets(this);
+            
+            // Notify React Native about data change with slight delay to ensure DB write is complete
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    notifyReactNativeDataChanged();
+                }
+            }, 100);
             
             Toast.makeText(this, "저장된 주차 메모가 삭제되었습니다.", Toast.LENGTH_SHORT).show();
             setEditingMode(false);
@@ -609,24 +627,40 @@ public class ParkingInputDialogActivity extends Activity {
                 SQLiteDatabase.OPEN_READWRITE
             );
             
-            ContentValues locationValues = new ContentValues();
-            locationValues.put("key", "parkingLocation");
-            locationValues.put("value", combinedLocation);
-            
-            // Save timestamp
-            ContentValues timestampValues = new ContentValues();
-            timestampValues.put("key", "parkingLocationTimestamp");
-            timestampValues.put("value", String.valueOf(System.currentTimeMillis()));
-            
-            // Insert or replace both location and timestamp
-            db.insertWithOnConflict("catalystLocalStorage", null, locationValues, SQLiteDatabase.CONFLICT_REPLACE);
-            db.insertWithOnConflict("catalystLocalStorage", null, timestampValues, SQLiteDatabase.CONFLICT_REPLACE);
-            db.close();
+            // Use transaction to ensure atomicity
+            db.beginTransaction();
+            try {
+                ContentValues locationValues = new ContentValues();
+                locationValues.put("key", "parkingLocation");
+                locationValues.put("value", combinedLocation);
+                
+                // Save timestamp
+                ContentValues timestampValues = new ContentValues();
+                timestampValues.put("key", "parkingLocationTimestamp");
+                timestampValues.put("value", String.valueOf(System.currentTimeMillis()));
+                
+                // Insert or replace both location and timestamp
+                db.insertWithOnConflict("catalystLocalStorage", null, locationValues, SQLiteDatabase.CONFLICT_REPLACE);
+                db.insertWithOnConflict("catalystLocalStorage", null, timestampValues, SQLiteDatabase.CONFLICT_REPLACE);
+                
+                db.setTransactionSuccessful();
+            } finally {
+                db.endTransaction();
+                db.close();
+            }
             
             // Update widgets
             ParkingWidgetMediumProvider.updateAllWidgets(this);
             ParkingWidgetSquareProvider.updateAllWidgets(this);
             ParkingWidgetWideProvider.updateAllWidgets(this);
+            
+            // Notify React Native about data change with slight delay to ensure DB write is complete
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    notifyReactNativeDataChanged();
+                }
+            }, 100);
             
             Toast.makeText(this, combinedLocation + "으로 저장되었습니다.", Toast.LENGTH_SHORT).show();
             setEditingMode(false);
@@ -635,6 +669,22 @@ public class ParkingInputDialogActivity extends Activity {
         } catch (Exception e) {
             Log.e(TAG, "Error saving location: " + e.getMessage());
             Toast.makeText(this, "저장 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
+        }
+    }
+    
+    private void notifyReactNativeDataChanged() {
+        try {
+            // Get the React Application context and emit data changed event
+            ReactApplication reactApp = (ReactApplication) getApplication();
+            ReactApplicationContext reactContext = 
+                (ReactApplicationContext) reactApp.getReactNativeHost().getReactInstanceManager().getCurrentReactContext();
+            
+            if (reactContext != null) {
+                ParkingWidgetModule.emitDataChangedEvent(reactContext);
+                Log.d(TAG, "Notified React Native about data change");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error notifying React Native: " + e.getMessage());
         }
     }
 } 

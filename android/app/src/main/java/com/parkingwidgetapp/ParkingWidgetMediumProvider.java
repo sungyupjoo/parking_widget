@@ -11,6 +11,8 @@ public class ParkingWidgetMediumProvider extends AppWidgetProvider {
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         ParkingWidgetUtil.updateWidget(context, appWidgetManager, appWidgetIds, 
                                       R.layout.widget_parking_medium, "ParkingWidgetMedium");
+        // Initialize midnight scheduler when widget is updated
+        MidnightScheduler.initializeMidnightScheduler(context);
     }
 
     public static void updateAllWidgets(Context context) {

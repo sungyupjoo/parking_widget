@@ -100,12 +100,40 @@ public class ParkingWidgetUtil {
         java.util.Calendar savedCal = java.util.Calendar.getInstance();
         savedCal.setTimeInMillis(savedTimestamp);
         
+        java.util.Calendar nowCal = java.util.Calendar.getInstance();
+        
+        // Check if it's today
+        boolean isToday = savedCal.get(java.util.Calendar.YEAR) == nowCal.get(java.util.Calendar.YEAR) &&
+                         savedCal.get(java.util.Calendar.DAY_OF_YEAR) == nowCal.get(java.util.Calendar.DAY_OF_YEAR);
+        
+        // Check if it's yesterday
+        java.util.Calendar yesterdayCal = java.util.Calendar.getInstance();
+        yesterdayCal.add(java.util.Calendar.DAY_OF_YEAR, -1);
+        boolean isYesterday = savedCal.get(java.util.Calendar.YEAR) == yesterdayCal.get(java.util.Calendar.YEAR) &&
+                             savedCal.get(java.util.Calendar.DAY_OF_YEAR) == yesterdayCal.get(java.util.Calendar.DAY_OF_YEAR);
+        
         int hour = savedCal.get(java.util.Calendar.HOUR_OF_DAY);
         int minute = savedCal.get(java.util.Calendar.MINUTE);
-        
         String amPm = hour < 12 ? "오전" : "오후";
         int displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
         
-        return String.format("%s %d:%02d 저장", amPm, displayHour, minute);
+        String datePrefix;
+        if (isToday) {
+            datePrefix = "오늘";
+        } else if (isYesterday) {
+            datePrefix = "어제";
+        } else {
+            int month = savedCal.get(java.util.Calendar.MONTH) + 1;
+            int day = savedCal.get(java.util.Calendar.DAY_OF_MONTH);
+            int dayOfWeek = savedCal.get(java.util.Calendar.DAY_OF_WEEK);
+            
+            // Convert day of week to Korean
+            String[] koreanDays = {"", "일", "월", "화", "수", "목", "금", "토"};
+            String koreanDayOfWeek = koreanDays[dayOfWeek];
+            
+            datePrefix = String.format("%d월%d일(%s)", month, day, koreanDayOfWeek);
+        }
+        
+        return String.format("%s %s %d:%02d", datePrefix, amPm, displayHour, minute);
     }
 } 
