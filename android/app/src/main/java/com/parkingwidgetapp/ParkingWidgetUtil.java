@@ -117,23 +117,26 @@ public class ParkingWidgetUtil {
         String amPm = hour < 12 ? "오전" : "오후";
         int displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
         
-        String datePrefix;
         if (isToday) {
-            datePrefix = "오늘";
-        } else if (isYesterday) {
-            datePrefix = "어제";
+            // For today: just show "오전 10:30 저장" format
+            return String.format("%s %d:%02d 저장", amPm, displayHour, minute);
         } else {
-            int month = savedCal.get(java.util.Calendar.MONTH) + 1;
-            int day = savedCal.get(java.util.Calendar.DAY_OF_MONTH);
-            int dayOfWeek = savedCal.get(java.util.Calendar.DAY_OF_WEEK);
+            String datePrefix;
+            if (isYesterday) {
+                datePrefix = "어제";
+            } else {
+                int month = savedCal.get(java.util.Calendar.MONTH) + 1;
+                int day = savedCal.get(java.util.Calendar.DAY_OF_MONTH);
+                int dayOfWeek = savedCal.get(java.util.Calendar.DAY_OF_WEEK);
+                
+                // Convert day of week to Korean
+                String[] koreanDays = {"", "일", "월", "화", "수", "목", "금", "토"};
+                String koreanDayOfWeek = koreanDays[dayOfWeek];
+                
+                datePrefix = String.format("%d월%d일(%s)", month, day, koreanDayOfWeek);
+            }
             
-            // Convert day of week to Korean
-            String[] koreanDays = {"", "일", "월", "화", "수", "목", "금", "토"};
-            String koreanDayOfWeek = koreanDays[dayOfWeek];
-            
-            datePrefix = String.format("%d월%d일(%s)", month, day, koreanDayOfWeek);
+            return String.format("%s %s %d:%02d", datePrefix, amPm, displayHour, minute);
         }
-        
-        return String.format("%s %s %d:%02d", datePrefix, amPm, displayHour, minute);
     }
 } 
